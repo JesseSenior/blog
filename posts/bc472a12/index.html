@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" integrity="sha256-Vzbj7sDDS/woiFS3uNKo8eIuni59rjyNGtXfstRzStA=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.jsesnr.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"buttons","active":"gitalk","storage":true,"lazyload":true,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="MC超好玩的，谁会拒绝有趣的红石捏？ 本文主要记录一种在Ubuntu服务器中便捷地搭建MC服务器的方法。 搭建环境 Ubuntu 21.10 (GNU&#x2F;Linux 5.13.0-39-generic x86_64) Docker version 20.10.14, build a224086 Docker Image: itzg&#x2F;minecraft-server:latest">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在Ubuntu中搭建你的MC服务器——基于Docker">
+<meta property="og:url" content="https://blog.jsesnr.top/posts/bc472a12/index.html">
+<meta property="og:site_name" content="Jesse Senior&#39;s Blog">
+<meta property="og:description" content="MC超好玩的，谁会拒绝有趣的红石捏？ 本文主要记录一种在Ubuntu服务器中便捷地搭建MC服务器的方法。 搭建环境 Ubuntu 21.10 (GNU&#x2F;Linux 5.13.0-39-generic x86_64) Docker version 20.10.14, build a224086 Docker Image: itzg&#x2F;minecraft-server:latest">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://blog.jsesnr.top/posts/bc472a12/pic_1649234026617.png">
+<meta property="article:published_time" content="2023-01-23T16:04:41.577Z">
+<meta property="article:modified_time" content="2023-01-23T16:04:41.577Z">
+<meta property="article:author" content="Jesse Senior">
+<meta property="article:tag" content="Ubuntu">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="Minecraft Server">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://blog.jsesnr.top/posts/bc472a12/pic_1649234026617.png">
+
+
+<link rel="canonical" href="https://blog.jsesnr.top/posts/bc472a12/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.jsesnr.top/posts/bc472a12/","path":"posts/bc472a12/","title":"在Ubuntu中搭建你的MC服务器——基于Docker"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>在Ubuntu中搭建你的MC服务器——基于Docker | Jesse Senior's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+<style>.darkmode--activated{--body-bg-color:#282828;--content-bg-color:#333;--card-bg-color:#555;--text-color:#ccc;--blockquote-color:#bbb;--link-color:#ccc;--link-hover-color:#eee;--brand-color:#ddd;--brand-hover-color:#ddd;--table-row-odd-bg-color:#282828;--table-row-hover-bg-color:#363636;--menu-item-bg-color:#555;--btn-default-bg:#222;--btn-default-color:#ccc;--btn-default-border-color:#555;--btn-default-hover-bg:#666;--btn-default-hover-color:#ccc;--btn-default-hover-border-color:#666;--highlight-background:#282b2e;--highlight-foreground:#a9b7c6;--highlight-gutter-background:#34393d;--highlight-gutter-foreground:#9ca9b6}.darkmode--activated img{opacity:.75}.darkmode--activated img:hover{opacity:.9}.darkmode--activated code{color:#69dbdc;background:0 0}button.darkmode-toggle{z-index:9999}.darkmode-ignore,img{display:flex!important}</style></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Jesse Senior's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">咕咕咕🕊</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E7%8E%AF%E5%A2%83"><span class="nav-number">1.</span> <span class="nav-text">搭建环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E7%BD%AE%EF%BC%9ADocker-%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">前置：Docker 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%87%92%E4%BA%BA%E6%96%B9%E6%A1%88%E2%80%94%E2%80%94%E4%BD%BF%E7%94%A8%E8%84%9A%E6%9C%AC"><span class="nav-number">2.1.</span> <span class="nav-text">懒人方案——使用脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E6%96%B9%E6%A1%88%E2%80%94%E2%80%94%E4%BB%8E%E5%AE%98%E6%96%B9%E4%BB%93%E5%BA%93%E4%B8%8B%E8%BD%BD"><span class="nav-number">2.2.</span> <span class="nav-text">手动方案——从官方仓库下载</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%BB%93%E5%BA%93"><span class="nav-number">2.2.1.</span> <span class="nav-text">配置仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BDDocker"><span class="nav-number">2.2.2.</span> <span class="nav-text">下载Docker</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8Docker%E4%B8%AD%E9%83%A8%E7%BD%B2Minecraft-Server"><span class="nav-number">3.</span> <span class="nav-text">在Docker中部署Minecraft Server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MC%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%AE%A1%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">MC服务器管理</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Jesse Senior"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Jesse Senior</p>
+  <div class="site-description" itemprop="description">余霞散成绮,澄江静如练。</div>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/JesseSenior" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;JesseSenior" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://blog.jsesnr.top/posts/bc472a12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Jesse Senior">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jesse Senior's Blog">
+      <meta itemprop="description" content="余霞散成绮,澄江静如练。">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="在Ubuntu中搭建你的MC服务器——基于Docker | Jesse Senior's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          在Ubuntu中搭建你的MC服务器——基于Docker
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-01-24 00:04:41" itemprop="dateCreated datePublished" datetime="2023-01-24T00:04:41+08:00">2023-01-24</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>2.2k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>4 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><del>MC超好玩的，谁会拒绝有趣的红石捏？</del></p>
+<p>本文主要记录一种在Ubuntu服务器中便捷地搭建MC服务器的方法。</p>
+<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><ul>
+<li>Ubuntu 21.10 (GNU&#x2F;Linux 5.13.0-39-generic x86_64)</li>
+<li>Docker version 20.10.14, build a224086</li>
+<li>Docker Image: itzg&#x2F;minecraft-server:latest</li>
+</ul>
+<h2 id="前置：Docker-安装"><a href="#前置：Docker-安装" class="headerlink" title="前置：Docker 安装"></a>前置：Docker 安装</h2><p>详细内容可参考<a target="_blank" rel="noopener" href="https://docs.docker.com/engine/install/ubuntu/">Docker官方文档</a>，如果不害怕英文的话。</p>
+<p>注意，以下的方案均需要服务器sudo权限，</p>
+<h3 id="懒人方案——使用脚本"><a href="#懒人方案——使用脚本" class="headerlink" title="懒人方案——使用脚本"></a>懒人方案——使用脚本</h3><blockquote>
+<p>Docker provides a convenience script at get.docker.com to install Docker into development environments quickly and non-interactively. <strong>The convenience script is not recommended for production environments</strong>, but can be used as an example to create a provisioning script that is tailored to your needs.</p>
+</blockquote>
+<p>在命令行中输入以下命令：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com -o get-docker.sh</span><br><span class="line">sudo sh get-docker.sh</span><br></pre></td></tr></table></figure>
+
+<p>然后等一会就好了。</p>
+<h3 id="手动方案——从官方仓库下载"><a href="#手动方案——从官方仓库下载" class="headerlink" title="手动方案——从官方仓库下载"></a>手动方案——从官方仓库下载</h3><h4 id="配置仓库"><a href="#配置仓库" class="headerlink" title="配置仓库"></a>配置仓库</h4><ol>
+<li>下载前置包并添加Docker官方GPG公钥</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install \</span><br><span class="line">    ca-certificates \</span><br><span class="line">    curl \</span><br><span class="line">    gnupg \</span><br><span class="line">    lsb-release</span><br><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>添加Docker稳定版仓库</li>
+</ol>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> \</span><br><span class="line">  <span class="string">&quot;deb [arch=<span class="subst">$(dpkg --print-architecture)</span> signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \</span></span><br><span class="line"><span class="string">  <span class="subst">$(lsb_release -cs)</span> stable&quot;</span> | sudo <span class="built_in">tee</span> /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br></pre></td></tr></table></figure>
+
+<h4 id="下载Docker"><a href="#下载Docker" class="headerlink" title="下载Docker"></a>下载Docker</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
+
+<p>验证安装是否成功：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo docker run hello-world</span><br></pre></td></tr></table></figure>
+
+<p>如果成功则可以看到如下截图：</p>
+<p><img src="/posts/bc472a12/pic_1649234026617.png" alt="图 1">  </p>
+<h2 id="在Docker中部署Minecraft-Server"><a href="#在Docker中部署Minecraft-Server" class="headerlink" title="在Docker中部署Minecraft Server"></a>在Docker中部署Minecraft Server</h2><p>这里使用一个由itzg以及其余百位大佬共同维护的一个Docker镜像：<a target="_blank" rel="noopener" href="https://hub.docker.com/r/itzg/minecraft-server">minecraft-server</a>（<a target="_blank" rel="noopener" href="https://github.com/itzg/docker-minecraft-server">Github地址</a>）</p>
+<p>在命令行中输入以下指令（注意修改部分参数以符合你的需求）：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    -d -it \ <span class="comment"># 后台运行容器，以交互模式运行容器并为容器重新分配一个伪终端</span></span><br><span class="line">    -p 25565:25565 \ <span class="comment"># 宿主机端口:容器端口</span></span><br><span class="line">    --name=mcserver \ <span class="comment"># 容器名称，便于后续管理</span></span><br><span class="line">    --<span class="built_in">env</span>=EXEC_DIRECTLY=<span class="literal">true</span> \ <span class="comment"># 允许docker attach显示彩色输出</span></span><br><span class="line">    --<span class="built_in">env</span>=EULA=TRUE \ <span class="comment"># 接受EULA协议</span></span><br><span class="line">    --<span class="built_in">env</span>=VERSION=1.18.2 \ <span class="comment"># 指定游戏版本为1.18.2，默认使用最新版</span></span><br><span class="line">    --<span class="built_in">env</span>=TZ=Asia/Shanghai \ <span class="comment"># mc服务器日志时区</span></span><br><span class="line">    --<span class="built_in">env</span>=TYPE=PAPER \ <span class="comment"># 服务器核心类型</span></span><br><span class="line">    --<span class="built_in">env</span>=MEMORY=4G \ <span class="comment"># 指定内存限制</span></span><br><span class="line">    --<span class="built_in">env</span>=LOG_TIMESTAMP=<span class="literal">true</span> \ <span class="comment"># 在日志中记录时间戳</span></span><br><span class="line">    --volume=/foo/bar:/data \ <span class="comment"># 宿主机存储目录:容器内部目录。修改为你的目录！</span></span><br><span class="line">    --restart=always \ <span class="comment"># 容器停止便立即重启</span></span><br><span class="line">    itzg/minecraft-server</span><br></pre></td></tr></table></figure>
+
+<p>执行后耐心等待镜像下载以及游戏核心下载即可，如果下载出现问题可以删除容器后重新运行。</p>
+<h2 id="MC服务器管理"><a href="#MC服务器管理" class="headerlink" title="MC服务器管理"></a>MC服务器管理</h2><ul>
+<li>查看容器状态</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>交互式控制</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -i mcserver rcon-cli</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>只执行单条指令（例如<code>stop</code>)：</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> mcserver rcon-cli stop</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>附加到服务器命令行：</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker attach mcserver</span><br></pre></td></tr></table></figure>
+
+<p><em>退出方法：依次按下<code>Ctrl-p</code>、<code>Ctrl-q</code>以安全地退出服务器命令行。</em></p>
+<ul>
+<li>查看服务器日志：</li>
+</ul>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker logs mcserver</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Jesse Senior
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="https://blog.jsesnr.top/posts/bc472a12/" title="在Ubuntu中搭建你的MC服务器——基于Docker">https://blog.jsesnr.top/posts/bc472a12/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/Ubuntu/" rel="tag"><i class="fa fa-tag"></i> Ubuntu</a>
+              <a href="/tags/Docker/" rel="tag"><i class="fa fa-tag"></i> Docker</a>
+              <a href="/tags/Minecraft-Server/" rel="tag"><i class="fa fa-tag"></i> Minecraft Server</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/87e5865b/" rel="prev" title="HELLO WORLD">
+                  <i class="fa fa-chevron-left"></i> HELLO WORLD
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments gitalk-container"></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-square"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jesse Senior</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" integrity="sha256-yt2kYMy0w8AbtF89WXb2P1rfjcP/HTHLT7097U8Y5b8=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pangu@4.0.7/dist/browser/pangu.min.js" integrity="sha256-j+yj56cdEY2CwkVtGyz18fNybFGpMGJ8JxG3GSyO2+I=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+  <script src="/js/third-party/fancybox.js"></script>
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/darkmode-js@1.5.7/lib/darkmode-js.min.js"></script>
+
+<script>
+var options = {
+  bottom: '64px',
+  right: 'unset',
+  left: '32px',
+  time: '0.5s',
+  mixColor: 'transparent',
+  backgroundColor: 'transparent',
+  buttonColorDark: '#100f2c',
+  buttonColorLight: '#fff',
+  saveInCookies: true,
+  label: '🌓',
+  autoMatchOsTheme: false
+}
+const darkmode = new Darkmode(options);
+window.darkmode = darkmode;
+darkmode.showWidget();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
+
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"JesseSenior","repo":"blog","client_id":"17f6deb4d5e389b14ce3","client_secret":"ffbcebf3fefb8f4599914faadc68565a5d653c6c","admin_user":"JesseSenior","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"a25d76c430a5d18cad77abd364ba04ed"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
+
+</body>
+</html>
