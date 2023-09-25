@@ -16,6 +16,54 @@
 ]]></content>
   </entry>
   <entry>
+    <title>WSL2多开Ubuntu实例</title>
+    <url>/posts/90d3eb82/</url>
+    <content><![CDATA[<p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件<em>（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）</em>。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
+<p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
+<h2 id="下载-Ubuntu-WSL2-最新镜像"><a href="#下载-Ubuntu-WSL2-最新镜像" class="headerlink" title="下载 Ubuntu WSL2 最新镜像"></a>下载 Ubuntu WSL2 最新镜像</h2><p>以下是Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）下载地址：</p>
+<p><a href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
+<p>但考虑到国内网络环境，也可以通过清华大学开源软件镜像站（或者别的国内镜像站）下载：</p>
+<p><a href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
+<p>参考下载命令:</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Invoke-WebRequest</span> <span class="literal">-Uri</span> <span class="string">&quot;https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span> <span class="literal">-OutFile</span> <span class="string">&quot;ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="导入到WSL2中"><a href="#导入到WSL2中" class="headerlink" title="导入到WSL2中"></a>导入到WSL2中</h2><p>导入命令如下所示</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> &lt;DistroName&gt; &lt;InstallLocation&gt; &lt;InstallTarFile&gt;</span><br></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<ul>
+<li><code>&lt;DistroName&gt;</code>：实例名称</li>
+<li><code>&lt;InstallLocation&gt;</code>：实例安装位置</li>
+<li><code>&lt;InstallTarFile&gt;</code>：安装文件位置</li>
+</ul>
+<p>以下为命令示例：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> Ubuntu<span class="literal">-Example</span>  .\Ubuntu<span class="literal">-Example</span>\ .\ubuntu<span class="literal">-jammy-wsl-amd64-wsl</span>.rootfs.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>修改实例名和安装位置就可以实现多开辣！</p>
+<p>导入成功后可以通过以下命令进入创建好的Ubuntu实例：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">-d</span> &lt;DistroName&gt;</span><br></pre></td></tr></table></figure>
+
+<h2 id="配置普通用户账户"><a href="#配置普通用户账户" class="headerlink" title="配置普通用户账户"></a>配置普通用户账户</h2><p>在容器中运行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">read</span> -p <span class="string">&quot;Please enter username: &quot;</span> NEW_USER</span><br><span class="line">useradd -m -G sudo -s /bin/bash <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line">passwd <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line"><span class="built_in">tee</span> /etc/wsl.conf &lt;&lt;<span class="string">_EOF</span></span><br><span class="line"><span class="string">[user]</span></span><br><span class="line"><span class="string">default=$&#123;NEW_USER&#125;</span></span><br><span class="line"><span class="string">_EOF</span></span><br></pre></td></tr></table></figure>
+
+<p>然后退出WSL2容器(Ctrl+D)，在PowerShell中运行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wsl --terminate &lt;Distribution Name&gt;</span><br><span class="line">wsl -d &lt;Distribution Name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>现在便是以普通用户进行操作啦~</p>
+<hr>
+<p>参考资料：</p>
+<ul>
+<li><a href="https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2">https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2</a></li>
+<li><a href="https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro">https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>OpenWrt</tag>
+        <tag>WSL2</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>在Ubuntu中搭建你的MC服务器——基于Docker</title>
     <url>/posts/bc472a12/</url>
     <content><![CDATA[<p><del>MC超好玩的，谁会拒绝有趣的红石捏？</del></p>
@@ -86,54 +134,6 @@
         <tag>Ubuntu</tag>
         <tag>Docker</tag>
         <tag>Minecraft Server</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>WSL2多开Ubuntu实例</title>
-    <url>/posts/90d3eb82/</url>
-    <content><![CDATA[<p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件<em>（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）</em>。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
-<p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
-<h2 id="下载-Ubuntu-WSL2-最新镜像"><a href="#下载-Ubuntu-WSL2-最新镜像" class="headerlink" title="下载 Ubuntu WSL2 最新镜像"></a>下载 Ubuntu WSL2 最新镜像</h2><p>以下是Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）下载地址：</p>
-<p><a href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
-<p>但考虑到国内网络环境，也可以通过清华大学开源软件镜像站（或者别的国内镜像站）下载：</p>
-<p><a href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
-<p>参考下载命令:</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Invoke-WebRequest</span> <span class="literal">-Uri</span> <span class="string">&quot;https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span> <span class="literal">-OutFile</span> <span class="string">&quot;ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="导入到WSL2中"><a href="#导入到WSL2中" class="headerlink" title="导入到WSL2中"></a>导入到WSL2中</h2><p>导入命令如下所示</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> &lt;DistroName&gt; &lt;InstallLocation&gt; &lt;InstallTarFile&gt;</span><br></pre></td></tr></table></figure>
-
-<p>其中：</p>
-<ul>
-<li><code>&lt;DistroName&gt;</code>：实例名称</li>
-<li><code>&lt;InstallLocation&gt;</code>：实例安装位置</li>
-<li><code>&lt;InstallTarFile&gt;</code>：安装文件位置</li>
-</ul>
-<p>以下为命令示例：</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> Ubuntu<span class="literal">-Example</span>  .\Ubuntu<span class="literal">-Example</span>\ .\ubuntu<span class="literal">-jammy-wsl-amd64-wsl</span>.rootfs.tar.gz</span><br></pre></td></tr></table></figure>
-
-<p>修改实例名和安装位置就可以实现多开辣！</p>
-<p>导入成功后可以通过以下命令进入创建好的Ubuntu实例：</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">-d</span> &lt;DistroName&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置普通用户账户"><a href="#配置普通用户账户" class="headerlink" title="配置普通用户账户"></a>配置普通用户账户</h2><p>在容器中运行以下命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">read</span> -p <span class="string">&quot;Please enter username: &quot;</span> NEW_USER</span><br><span class="line">useradd -m -G sudo -s /bin/bash <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line">passwd <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line"><span class="built_in">tee</span> /etc/wsl.conf &lt;&lt;<span class="string">_EOF</span></span><br><span class="line"><span class="string">[user]</span></span><br><span class="line"><span class="string">default=$&#123;NEW_USER&#125;</span></span><br><span class="line"><span class="string">_EOF</span></span><br></pre></td></tr></table></figure>
-
-<p>然后退出WSL2容器(Ctrl+D)，在PowerShell中运行以下命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wsl --terminate &lt;Distribution Name&gt;</span><br><span class="line">wsl -d &lt;Distribution Name&gt;</span><br></pre></td></tr></table></figure>
-
-<p>现在便是以普通用户进行操作啦~</p>
-<hr>
-<p>参考资料：</p>
-<ul>
-<li><a href="https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2">https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2</a></li>
-<li><a href="https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro">https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-        <tag>OpenWrt</tag>
-        <tag>WSL2</tag>
       </tags>
   </entry>
 </search>
