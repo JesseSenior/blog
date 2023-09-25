@@ -2719,5 +2719,5 @@ body {
   opacity: 0.9;
 }
 .footer {
-  color: #333;
+  color: $white-dim;
 }
