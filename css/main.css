@@ -2697,11 +2697,11 @@ mark.search-keyword {
   }
 }
 body {
-  background-image: url("/images/background.webp");
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  background-size: cover;
-  background-position: center;
+  background-image: url("/images/background.webp") !important;
+  background-repeat: no-repeat !important;
+  background-attachment: fixed !important;
+  background-size: cover !important;
+  background-position: center !important;
 }
 .header-inner {
   opacity: 0.9;
