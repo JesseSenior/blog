@@ -2734,12 +2734,18 @@ mark.search-keyword {
   }
 }
 body {
-  background-image: url("../images/background.png");
+  background-image: url("../images/background.webp");
   height: 100%;
   width: 100%;
   background-repeat: repeat-x;
   background-attachment: fixed;
   background-size: cover;
+}
+.header-inner {
+  opacity: 0.9;
+}
+.main-inner {
+  opacity: 0.9;
 }
 .content-wrap {
   opacity: 0.9;

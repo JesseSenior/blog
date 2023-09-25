@@ -23,12 +23,12 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"blog.jsesnr.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"buttons","active":"gitalk","storage":true,"lazyload":true,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="余霞散成绮,澄江静如练。">
+    <meta name="description" content="余霞散成绮，澄江静如练">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Jesse Senior&#39;s Blog">
 <meta property="og:url" content="https://blog.jsesnr.top/index.html">
 <meta property="og:site_name" content="Jesse Senior&#39;s Blog">
-<meta property="og:description" content="余霞散成绮,澄江静如练。">
+<meta property="og:description" content="余霞散成绮，澄江静如练">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:author" content="Jesse Senior">
 <meta name="twitter:card" content="summary">
@@ -74,7 +74,7 @@
       <h1 class="site-title">Jesse Senior's Blog</h1>
       <i class="logo-line"></i>
     </a>
-      <p class="site-subtitle" itemprop="description">咕咕咕🕊</p>
+      <p class="site-subtitle" itemprop="description">Seek truth from facts.</p>
   </div>
 
   <div class="site-nav-right">
@@ -150,9 +150,9 @@
         <div class="site-overview-wrap sidebar-panel">
           <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Jesse Senior"
-      src="/images/avatar.png">
+      src="/images/avatar.webp">
   <p class="site-author-name" itemprop="name">Jesse Senior</p>
-  <div class="site-description" itemprop="description">余霞散成绮,澄江静如练。</div>
+  <div class="site-description" itemprop="description">余霞散成绮，澄江静如练</div>
 </div>
   <div class="links-of-author site-overview-item animated">
       <span class="links-of-author-item">
@@ -192,16 +192,110 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://blog.jsesnr.top/posts/bc472a12/">
+    <link itemprop="mainEntityOfPage" href="https://blog.jsesnr.top/posts/90d3eb82/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="image" content="/images/avatar.webp">
       <meta itemprop="name" content="Jesse Senior">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Jesse Senior's Blog">
-      <meta itemprop="description" content="余霞散成绮,澄江静如练。">
+      <meta itemprop="description" content="余霞散成绮，澄江静如练">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Jesse Senior's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/posts/90d3eb82/" class="post-title-link" itemprop="url">WSL2多开Ubuntu实例</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-25 19:27:12" itemprop="dateCreated datePublished" datetime="2022-06-25T19:27:12+08:00">2022-06-25</time>
+    </span>
+
+  
+    <span class="post-meta-break"></span>
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>1.7k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>3 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件<em>（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）</em>。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
+<p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
+<h2 id="下载-Ubuntu-WSL2-最新镜像"><a href="#下载-Ubuntu-WSL2-最新镜像" class="headerlink" title="下载 Ubuntu WSL2 最新镜像"></a>下载 Ubuntu WSL2 最新镜像</h2><p>以下是Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）下载地址：</p>
+<p><a target="_blank" rel="noopener" href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/posts/90d3eb82/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://blog.jsesnr.top/posts/bc472a12/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.webp">
+      <meta itemprop="name" content="Jesse Senior">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jesse Senior's Blog">
+      <meta itemprop="description" content="余霞散成绮，澄江静如练">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
@@ -293,13 +387,13 @@
     <link itemprop="mainEntityOfPage" href="https://blog.jsesnr.top/posts/87e5865b/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="image" content="/images/avatar.webp">
       <meta itemprop="name" content="Jesse Senior">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="Jesse Senior's Blog">
-      <meta itemprop="description" content="余霞散成绮,澄江静如练。">
+      <meta itemprop="description" content="余霞散成绮，澄江静如练">
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
