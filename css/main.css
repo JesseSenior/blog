@@ -2703,21 +2703,43 @@ body {
   background-size: cover !important;
   background-position: center !important;
 }
+.footer {
+  color: rgba(255,255,255,0.5);
+}
 .header-inner {
   opacity: 0.9;
 }
 .main-inner {
-  opacity: 0.9;
+  background-color: rgba(255,255,255,0);
+  padding: 20px 40px 10px 40px;
+}
+:root {
+  --content-bg-color-alpha: rgba(255,255,255,0.9);
+}
+.darkmode--activated {
+  --content-bg-color-alpha: rgba(51,51,51,0.9);
+}
+.post-block {
+  background: var(--content-bg-color-alpha);
+  margin-bottom: 24px;
+  padding: 40px;
+  box-shadow: 8px 7px 2px 0 rgba(0,0,0,0.24), 7px 4px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.24);
+}
+.gt-container {
+  background: var(--content-bg-color-alpha);
+}
+.post-eof {
+  display: none;
 }
 .content-wrap {
   opacity: 0.9;
 }
 .sidebar {
-  opacity: 0.8;
+  background: var(--content-bg-color-alpha);
+}
+.sidebar-inner {
+  background: transparent;
 }
 .popup {
   opacity: 0.9;
-}
-.footer {
-  color: $white-dim;
 }
