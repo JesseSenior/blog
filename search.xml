@@ -5,6 +5,8 @@
     <url>/posts/bc472a12/</url>
     <content><![CDATA[<p><del>MC超好玩的，谁会拒绝有趣的红石捏？</del></p>
 <p>本文主要记录一种在Ubuntu服务器中便捷地搭建MC服务器的方法。</p>
+<span id="more"></span>
+
 <h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><ul>
 <li>Ubuntu 21.10 (GNU&#x2F;Linux 5.13.0-39-generic x86_64)</li>
 <li>Docker version 20.10.14, build a224086</li>
@@ -93,6 +95,8 @@
     <url>/posts/90d3eb82/</url>
     <content><![CDATA[<p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件<em>（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）</em>。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
 <p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
+<span id="more"></span>
+
 <h2 id="下载-Ubuntu-WSL2-最新镜像"><a href="#下载-Ubuntu-WSL2-最新镜像" class="headerlink" title="下载 Ubuntu WSL2 最新镜像"></a>下载 Ubuntu WSL2 最新镜像</h2><p>以下是Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）下载地址：</p>
 <p><a href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
 <p>但考虑到国内网络环境，也可以通过清华大学开源软件镜像站（或者别的国内镜像站）下载：</p>
@@ -134,5 +138,26 @@
         <tag>Ubuntu</tag>
         <tag>WSL2</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>iCalendar日历文件裁剪</title>
+    <url>/posts/2bef1db1/</url>
+    <content><![CDATA[<p>由于了解到之前部署的Radicale<a href="https://radicale.org/v3.html#oriented-to-calendar-and-contact-user-agents">似乎并未严格遵守RFC 5545标准</a>，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。</p>
+<span id="more"></span>
+
+<div class="note danger"><p>友情提示：使用脚本前请<strong>备份</strong>你的日历文件</p>
+</div>
+
+<p>本脚本依赖<a href="https://github.com/collective/icalendar">icalendar</a>模块。其作用主要是读入ics文件中的全部Component（例如<code>VEVENT</code>、<code>VTODO</code>等），并提取其中<strong>最近</strong>的日期（如果你的日历中有持续或者重复时间为<strong>永远</strong>的请谨慎使用），将其与<code>watershed_datetime</code>比较。若<code>is_before_watershed_datetime = True</code>，则保存比<code>watershed_datetime</code>更早的Component，否则保存更新的Component。</p>
+<figure class="highlight python"><figcaption><span>ics_rotate.py</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> icalendar <span class="keyword">import</span> Calendar</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> date, time, datetime</span><br><span class="line"><span class="keyword">import</span> pytz</span><br><span class="line"></span><br><span class="line">uniform_tz = pytz.timezone(<span class="string">&quot;Asia/Shanghai&quot;</span>)</span><br><span class="line">watershed_datetime = datetime(<span class="number">2022</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, tzinfo=uniform_tz)</span><br><span class="line">is_before_watershed_datetime = <span class="literal">True</span>  <span class="comment"># 取事件最近日期，保存分水岭前/后的事件</span></span><br><span class="line"></span><br><span class="line">read_file_path = <span class="string">&quot;my-calendar.ics&quot;</span></span><br><span class="line">save_file_path = <span class="string">&quot;my-calendar-20220101.ics&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_datetime_from_event</span>(<span class="params">event, param</span>):</span><br><span class="line">    result = event.get(param).dt</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(result) == date:</span><br><span class="line">        result = datetime.combine(</span><br><span class="line">            result,</span><br><span class="line">            time(tzinfo=uniform_tz),</span><br><span class="line">        )</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(read_file_path, <span class="string">&quot;r&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    cal = Calendar.from_ical(f.read())</span><br><span class="line"></span><br><span class="line">new_cal = Calendar()</span><br><span class="line"></span><br><span class="line">param_list = [<span class="string">&quot;dtstart&quot;</span>, <span class="string">&quot;dtend&quot;</span>, <span class="string">&quot;due&quot;</span>, <span class="string">&quot;completed&quot;</span>, <span class="string">&quot;dtstamp&quot;</span>]</span><br><span class="line">watershed_datetime = watershed_datetime.replace(tzinfo=pytz.UTC)</span><br><span class="line"><span class="keyword">for</span> event <span class="keyword">in</span> cal.walk():</span><br><span class="line">    <span class="keyword">if</span> event.name <span class="keyword">not</span> <span class="keyword">in</span> [</span><br><span class="line">        <span class="string">&quot;VEVENT&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTODO&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VJOURNAL&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VFREEBUSY&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTIMEZONE&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VALARM&quot;</span>,</span><br><span class="line">    ]:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    dates = <span class="built_in">list</span>()</span><br><span class="line">    <span class="keyword">for</span> param <span class="keyword">in</span> param_list:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            dates.append(get_datetime_from_event(event, param))</span><br><span class="line">        <span class="keyword">except</span> AttributeError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(dates) &gt; <span class="number">0</span>:</span><br><span class="line">        event_datetime = <span class="built_in">max</span>(dates).replace(tzinfo=pytz.UTC)</span><br><span class="line">        <span class="keyword">if</span> (</span><br><span class="line">            event_datetime &gt;= watershed_datetime</span><br><span class="line">        ) ^ is_before_watershed_datetime:</span><br><span class="line">            new_cal.add_component(event)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        new_cal.add_component(event)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(save_file_path, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(new_cal.to_ical().decode(<span class="string">&quot;utf-8&quot;</span>).replace(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>).strip())</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p>参考资料：</p>
+<ul>
+<li><a href="https://docs.python.org/3/library/datetime.html">https://docs.python.org/3/library/datetime.html</a></li>
+<li><a href="https://github.com/collective/icalendar">https://github.com/collective/icalendar</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc5545">https://datatracker.ietf.org/doc/html/rfc5545</a></li>
+</ul>
+]]></content>
   </entry>
 </search>

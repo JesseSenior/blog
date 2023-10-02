@@ -23,29 +23,27 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"blog.jsesnr.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.11.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":true,"comments":{"style":"buttons","active":"gitalk","storage":true,"lazyload":true,"nav":null,"activeClass":"gitalk"},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"slideDownIn","post_header":"fadeIn","post_body":"fadeIn","coll_header":"slideLeftIn","sidebar":"fadeIn"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个WSL2(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ 然而目前的WSL并不支持">
+    <meta name="description" content="由于了解到之前部署的Radicale似乎并未严格遵守RFC 5545标准，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="WSL2多开Ubuntu实例">
-<meta property="og:url" content="https://blog.jsesnr.top/posts/90d3eb82/index.html">
+<meta property="og:title" content="iCalendar日历文件裁剪">
+<meta property="og:url" content="https://blog.jsesnr.top/posts/2bef1db1/index.html">
 <meta property="og:site_name" content="Jesse Senior&#39;s Blog">
-<meta property="og:description" content="最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个WSL2(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ 然而目前的WSL并不支持">
+<meta property="og:description" content="由于了解到之前部署的Radicale似乎并未严格遵守RFC 5545标准，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-06-25T11:27:12.000Z">
-<meta property="article:modified_time" content="2022-06-25T11:27:12.000Z">
+<meta property="article:published_time" content="2022-08-02T12:15:57.000Z">
+<meta property="article:modified_time" content="2022-08-02T12:15:57.000Z">
 <meta property="article:author" content="Jesse Senior">
-<meta property="article:tag" content="Ubuntu">
-<meta property="article:tag" content="WSL2">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="https://blog.jsesnr.top/posts/90d3eb82/">
+<link rel="canonical" href="https://blog.jsesnr.top/posts/2bef1db1/">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.jsesnr.top/posts/90d3eb82/","path":"posts/90d3eb82/","title":"WSL2多开Ubuntu实例"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.jsesnr.top/posts/2bef1db1/","path":"posts/2bef1db1/","title":"iCalendar日历文件裁剪"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>WSL2多开Ubuntu实例 | Jesse Senior's Blog</title>
+<title>iCalendar日历文件裁剪 | Jesse Senior's Blog</title>
   
 
 
@@ -135,7 +133,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+    <div class="sidebar-inner sidebar-overview-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -148,7 +146,6 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD-Ubuntu-WSL2-%E6%9C%80%E6%96%B0%E9%95%9C%E5%83%8F"><span class="nav-number">1.</span> <span class="nav-text">下载 Ubuntu WSL2 最新镜像</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5%E5%88%B0WSL2%E4%B8%AD"><span class="nav-number">2.</span> <span class="nav-text">导入到WSL2中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E6%99%AE%E9%80%9A%E7%94%A8%E6%88%B7%E8%B4%A6%E6%88%B7"><span class="nav-number">3.</span> <span class="nav-text">配置普通用户账户</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -194,7 +191,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.jsesnr.top/posts/90d3eb82/">
+    <link itemprop="mainEntityOfPage" href="https://blog.jsesnr.top/posts/2bef1db1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.webp">
@@ -207,12 +204,12 @@
     </span>
 
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="WSL2多开Ubuntu实例 | Jesse Senior's Blog">
+      <meta itemprop="name" content="iCalendar日历文件裁剪 | Jesse Senior's Blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          WSL2多开Ubuntu实例
+          iCalendar日历文件裁剪
         </h1>
 
         <div class="post-meta-container">
@@ -223,7 +220,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-06-25 19:27:12" itemprop="dateCreated datePublished" datetime="2022-06-25T19:27:12+08:00">2022-06-25</time>
+      <time title="创建时间：2022-08-02 20:15:57" itemprop="dateCreated datePublished" datetime="2022-08-02T20:15:57+08:00">2022-08-02</time>
     </span>
 
   
@@ -233,14 +230,14 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>1.7k</span>
+      <span>2.3k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
+      <span>4 分钟</span>
     </span>
 </div>
 
@@ -251,45 +248,21 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件<em>（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）</em>。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
-<p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
+        <p>由于了解到之前部署的Radicale<a target="_blank" rel="noopener" href="https://radicale.org/v3.html#oriented-to-calendar-and-contact-user-agents">似乎并未严格遵守RFC 5545标准</a>，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。</p>
 <span id="more"></span>
 
-<h2 id="下载-Ubuntu-WSL2-最新镜像"><a href="#下载-Ubuntu-WSL2-最新镜像" class="headerlink" title="下载 Ubuntu WSL2 最新镜像"></a>下载 Ubuntu WSL2 最新镜像</h2><p>以下是Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）下载地址：</p>
-<p><a target="_blank" rel="noopener" href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
-<p>但考虑到国内网络环境，也可以通过清华大学开源软件镜像站（或者别的国内镜像站）下载：</p>
-<p><a target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
-<p>参考下载命令:</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Invoke-WebRequest</span> <span class="literal">-Uri</span> <span class="string">&quot;https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span> <span class="literal">-OutFile</span> <span class="string">&quot;ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span></span><br></pre></td></tr></table></figure>
+<div class="note danger"><p>友情提示：使用脚本前请<strong>备份</strong>你的日历文件</p>
+</div>
 
-<h2 id="导入到WSL2中"><a href="#导入到WSL2中" class="headerlink" title="导入到WSL2中"></a>导入到WSL2中</h2><p>导入命令如下所示</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> &lt;DistroName&gt; &lt;InstallLocation&gt; &lt;InstallTarFile&gt;</span><br></pre></td></tr></table></figure>
+<p>本脚本依赖<a target="_blank" rel="noopener" href="https://github.com/collective/icalendar">icalendar</a>模块。其作用主要是读入ics文件中的全部Component（例如<code>VEVENT</code>、<code>VTODO</code>等），并提取其中<strong>最近</strong>的日期（如果你的日历中有持续或者重复时间为<strong>永远</strong>的请谨慎使用），将其与<code>watershed_datetime</code>比较。若<code>is_before_watershed_datetime = True</code>，则保存比<code>watershed_datetime</code>更早的Component，否则保存更新的Component。</p>
+<figure class="highlight python"><figcaption><span>ics_rotate.py</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> icalendar <span class="keyword">import</span> Calendar</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> date, time, datetime</span><br><span class="line"><span class="keyword">import</span> pytz</span><br><span class="line"></span><br><span class="line">uniform_tz = pytz.timezone(<span class="string">&quot;Asia/Shanghai&quot;</span>)</span><br><span class="line">watershed_datetime = datetime(<span class="number">2022</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, tzinfo=uniform_tz)</span><br><span class="line">is_before_watershed_datetime = <span class="literal">True</span>  <span class="comment"># 取事件最近日期，保存分水岭前/后的事件</span></span><br><span class="line"></span><br><span class="line">read_file_path = <span class="string">&quot;my-calendar.ics&quot;</span></span><br><span class="line">save_file_path = <span class="string">&quot;my-calendar-20220101.ics&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_datetime_from_event</span>(<span class="params">event, param</span>):</span><br><span class="line">    result = event.get(param).dt</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(result) == date:</span><br><span class="line">        result = datetime.combine(</span><br><span class="line">            result,</span><br><span class="line">            time(tzinfo=uniform_tz),</span><br><span class="line">        )</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(read_file_path, <span class="string">&quot;r&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    cal = Calendar.from_ical(f.read())</span><br><span class="line"></span><br><span class="line">new_cal = Calendar()</span><br><span class="line"></span><br><span class="line">param_list = [<span class="string">&quot;dtstart&quot;</span>, <span class="string">&quot;dtend&quot;</span>, <span class="string">&quot;due&quot;</span>, <span class="string">&quot;completed&quot;</span>, <span class="string">&quot;dtstamp&quot;</span>]</span><br><span class="line">watershed_datetime = watershed_datetime.replace(tzinfo=pytz.UTC)</span><br><span class="line"><span class="keyword">for</span> event <span class="keyword">in</span> cal.walk():</span><br><span class="line">    <span class="keyword">if</span> event.name <span class="keyword">not</span> <span class="keyword">in</span> [</span><br><span class="line">        <span class="string">&quot;VEVENT&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTODO&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VJOURNAL&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VFREEBUSY&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTIMEZONE&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VALARM&quot;</span>,</span><br><span class="line">    ]:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    dates = <span class="built_in">list</span>()</span><br><span class="line">    <span class="keyword">for</span> param <span class="keyword">in</span> param_list:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            dates.append(get_datetime_from_event(event, param))</span><br><span class="line">        <span class="keyword">except</span> AttributeError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(dates) &gt; <span class="number">0</span>:</span><br><span class="line">        event_datetime = <span class="built_in">max</span>(dates).replace(tzinfo=pytz.UTC)</span><br><span class="line">        <span class="keyword">if</span> (</span><br><span class="line">            event_datetime &gt;= watershed_datetime</span><br><span class="line">        ) ^ is_before_watershed_datetime:</span><br><span class="line">            new_cal.add_component(event)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        new_cal.add_component(event)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(save_file_path, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(new_cal.to_ical().decode(<span class="string">&quot;utf-8&quot;</span>).replace(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>).strip())</span><br></pre></td></tr></table></figure>
 
-<p>其中：</p>
-<ul>
-<li><code>&lt;DistroName&gt;</code>：实例名称</li>
-<li><code>&lt;InstallLocation&gt;</code>：实例安装位置</li>
-<li><code>&lt;InstallTarFile&gt;</code>：安装文件位置</li>
-</ul>
-<p>以下为命令示例：</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> Ubuntu<span class="literal">-Example</span>  .\Ubuntu<span class="literal">-Example</span>\ .\ubuntu<span class="literal">-jammy-wsl-amd64-wsl</span>.rootfs.tar.gz</span><br></pre></td></tr></table></figure>
-
-<p>修改实例名和安装位置就可以实现多开辣！</p>
-<p>导入成功后可以通过以下命令进入创建好的Ubuntu实例：</p>
-<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wsl <span class="literal">-d</span> &lt;DistroName&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置普通用户账户"><a href="#配置普通用户账户" class="headerlink" title="配置普通用户账户"></a>配置普通用户账户</h2><p>在容器中运行以下命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">read</span> -p <span class="string">&quot;Please enter username: &quot;</span> NEW_USER</span><br><span class="line">useradd -m -G sudo -s /bin/bash <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line">passwd <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line"><span class="built_in">tee</span> /etc/wsl.conf &lt;&lt;<span class="string">_EOF</span></span><br><span class="line"><span class="string">[user]</span></span><br><span class="line"><span class="string">default=$&#123;NEW_USER&#125;</span></span><br><span class="line"><span class="string">_EOF</span></span><br></pre></td></tr></table></figure>
-
-<p>然后退出WSL2容器(Ctrl+D)，在PowerShell中运行以下命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wsl --terminate &lt;Distribution Name&gt;</span><br><span class="line">wsl -d &lt;Distribution Name&gt;</span><br></pre></td></tr></table></figure>
-
-<p>现在便是以普通用户进行操作啦~</p>
 <hr>
 <p>参考资料：</p>
 <ul>
-<li><a target="_blank" rel="noopener" href="https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2">https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2</a></li>
-<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro">https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.python.org/3/library/datetime.html">https://docs.python.org/3/library/datetime.html</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/collective/icalendar">https://github.com/collective/icalendar</a></li>
+<li><a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/rfc5545">https://datatracker.ietf.org/doc/html/rfc5545</a></li>
 </ul>
 
     </div>
@@ -308,7 +281,7 @@
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="https://blog.jsesnr.top/posts/90d3eb82/" title="WSL2多开Ubuntu实例">https://blog.jsesnr.top/posts/90d3eb82/</a>
+      <a href="https://blog.jsesnr.top/posts/2bef1db1/" title="iCalendar日历文件裁剪">https://blog.jsesnr.top/posts/2bef1db1/</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-SA</a> 许可协议。转载请注明出处！
@@ -316,23 +289,16 @@
 </ul>
 </div>
 
-          <div class="post-tags">
-              <a href="/tags/Ubuntu/" rel="tag"><i class="fa fa-tag"></i> Ubuntu</a>
-              <a href="/tags/WSL2/" rel="tag"><i class="fa fa-tag"></i> WSL2</a>
-          </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/posts/bc472a12/" rel="prev" title="在Ubuntu中搭建你的MC服务器——基于Docker">
-                  <i class="fa fa-chevron-left"></i> 在Ubuntu中搭建你的MC服务器——基于Docker
+                <a href="/posts/90d3eb82/" rel="prev" title="WSL2多开Ubuntu实例">
+                  <i class="fa fa-chevron-left"></i> WSL2多开Ubuntu实例
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/2bef1db1/" rel="next" title="iCalendar日历文件裁剪">
-                  iCalendar日历文件裁剪 <i class="fa fa-chevron-right"></i>
-                </a>
             </div>
           </div>
     </footer>
@@ -411,7 +377,7 @@ darkmode.showWidget();
 </script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
 
-<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"JesseSenior","repo":"blog","client_id":"9caf51b8892b8ec783c1","client_secret":"d6493ca5f2b7bb5a8bfce6681830dfde9b12b59d","admin_user":"JesseSenior","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"22b71e58bd0e4f0ee86324b4f5ade541"}</script>
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"JesseSenior","repo":"blog","client_id":"9caf51b8892b8ec783c1","client_secret":"d6493ca5f2b7bb5a8bfce6681830dfde9b12b59d","admin_user":"JesseSenior","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":null,"js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"cde6a76b5c3ab465c8790834471809a6"}</script>
 <script src="/js/third-party/comments/gitalk.js"></script>
 
 </body>

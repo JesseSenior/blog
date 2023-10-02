@@ -2719,6 +2719,9 @@ body {
 .darkmode--activated {
   --content-bg-color-alpha: rgba(51,51,51,0.9);
 }
+.note {
+  background: var(--card-bg-color) !important;
+}
 .post-block {
   background: var(--content-bg-color-alpha);
   margin-bottom: 24px;
