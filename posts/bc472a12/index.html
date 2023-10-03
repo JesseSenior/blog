@@ -254,66 +254,63 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p><del>MC超好玩的，谁会拒绝有趣的红石捏？</del></p>
+        <p><s>MC超好玩的，谁会拒绝有趣的红石捏？</s></p>
 <p>本文主要记录一种在Ubuntu服务器中便捷地搭建MC服务器的方法。</p>
 <span id="more"></span>
-
-<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><ul>
-<li>Ubuntu 21.10 (GNU&#x2F;Linux 5.13.0-39-generic x86_64)</li>
+<h2 id="搭建环境">搭建环境</h2>
+<ul>
+<li>Ubuntu 21.10 (GNU/Linux 5.13.0-39-generic x86_64)</li>
 <li>Docker version 20.10.14, build a224086</li>
-<li>Docker Image: itzg&#x2F;minecraft-server:latest</li>
+<li>Docker Image: itzg/minecraft-server:latest</li>
 </ul>
-<h2 id="前置：Docker-安装"><a href="#前置：Docker-安装" class="headerlink" title="前置：Docker 安装"></a>前置：Docker 安装</h2><p>详细内容可参考<a target="_blank" rel="noopener" href="https://docs.docker.com/engine/install/ubuntu/">Docker官方文档</a>，如果不害怕英文的话。</p>
+<h2 id="前置：Docker-安装">前置：Docker 安装</h2>
+<p>详细内容可参考<a target="_blank" rel="noopener" href="https://docs.docker.com/engine/install/ubuntu/">Docker官方文档</a>，如果不害怕英文的话。</p>
 <p>注意，以下的方案均需要服务器sudo权限，</p>
-<h3 id="懒人方案——使用脚本"><a href="#懒人方案——使用脚本" class="headerlink" title="懒人方案——使用脚本"></a>懒人方案——使用脚本</h3><blockquote>
-<p>Docker provides a convenience script at get.docker.com to install Docker into development environments quickly and non-interactively. <strong>The convenience script is not recommended for production environments</strong>, but can be used as an example to create a provisioning script that is tailored to your needs.</p>
+<h3 id="懒人方案——使用脚本">懒人方案——使用脚本</h3>
+<blockquote>
+<p>Docker provides a convenience script at <a target="_blank" rel="noopener" href="http://get.docker.com">get.docker.com</a> to install Docker into development environments quickly and non-interactively. <strong>The convenience script is not recommended for production environments</strong>, but can be used as an example to create a provisioning script that is tailored to your needs.</p>
 </blockquote>
 <p>在命令行中输入以下命令：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com -o get-docker.sh</span><br><span class="line">sudo sh get-docker.sh</span><br></pre></td></tr></table></figure>
-
 <p>然后等一会就好了。</p>
-<h3 id="手动方案——从官方仓库下载"><a href="#手动方案——从官方仓库下载" class="headerlink" title="手动方案——从官方仓库下载"></a>手动方案——从官方仓库下载</h3><h4 id="配置仓库"><a href="#配置仓库" class="headerlink" title="配置仓库"></a>配置仓库</h4><ol>
+<h3 id="手动方案——从官方仓库下载">手动方案——从官方仓库下载</h3>
+<h4 id="配置仓库">配置仓库</h4>
+<ol>
 <li>下载前置包并添加Docker官方GPG公钥</li>
 </ol>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install \</span><br><span class="line">    ca-certificates \</span><br><span class="line">    curl \</span><br><span class="line">    gnupg \</span><br><span class="line">    lsb-release</span><br><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span><br></pre></td></tr></table></figure>
-
 <ol start="2">
 <li>添加Docker稳定版仓库</li>
 </ol>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> \</span><br><span class="line">  <span class="string">&quot;deb [arch=<span class="subst">$(dpkg --print-architecture)</span> signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \</span></span><br><span class="line"><span class="string">  <span class="subst">$(lsb_release -cs)</span> stable&quot;</span> | sudo <span class="built_in">tee</span> /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br></pre></td></tr></table></figure>
-
-<h4 id="下载Docker"><a href="#下载Docker" class="headerlink" title="下载Docker"></a>下载Docker</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
-
+<h4 id="下载Docker">下载Docker</h4>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
 <p>验证安装是否成功：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo docker run hello-world</span><br></pre></td></tr></table></figure>
-
 <p>如果成功则可以看到如下截图：</p>
-<p><img src="/posts/bc472a12/pic_1649234026617.png" alt="图 1">  </p>
-<h2 id="在Docker中部署Minecraft-Server"><a href="#在Docker中部署Minecraft-Server" class="headerlink" title="在Docker中部署Minecraft Server"></a>在Docker中部署Minecraft Server</h2><p>这里使用一个由itzg以及其余百位大佬共同维护的一个Docker镜像：<a target="_blank" rel="noopener" href="https://hub.docker.com/r/itzg/minecraft-server">minecraft-server</a>（<a target="_blank" rel="noopener" href="https://github.com/itzg/docker-minecraft-server">Github地址</a>）</p>
+<p><img src="/posts/bc472a12/pic_1649234026617.png" alt="图 1"></p>
+<h2 id="在Docker中部署Minecraft-Server">在Docker中部署Minecraft Server</h2>
+<p>这里使用一个由itzg以及其余百位大佬共同维护的一个Docker镜像：<a target="_blank" rel="noopener" href="https://hub.docker.com/r/itzg/minecraft-server">minecraft-server</a>（<a target="_blank" rel="noopener" href="https://github.com/itzg/docker-minecraft-server">Github地址</a>）</p>
 <p>在命令行中输入以下指令（注意修改部分参数以符合你的需求）：</p>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    -d -it \ <span class="comment"># 后台运行容器，以交互模式运行容器并为容器重新分配一个伪终端</span></span><br><span class="line">    -p 25565:25565 \ <span class="comment"># 宿主机端口:容器端口</span></span><br><span class="line">    --name=mcserver \ <span class="comment"># 容器名称，便于后续管理</span></span><br><span class="line">    --<span class="built_in">env</span>=EXEC_DIRECTLY=<span class="literal">true</span> \ <span class="comment"># 允许docker attach显示彩色输出</span></span><br><span class="line">    --<span class="built_in">env</span>=EULA=TRUE \ <span class="comment"># 接受EULA协议</span></span><br><span class="line">    --<span class="built_in">env</span>=VERSION=1.18.2 \ <span class="comment"># 指定游戏版本为1.18.2，默认使用最新版</span></span><br><span class="line">    --<span class="built_in">env</span>=TZ=Asia/Shanghai \ <span class="comment"># mc服务器日志时区</span></span><br><span class="line">    --<span class="built_in">env</span>=TYPE=PAPER \ <span class="comment"># 服务器核心类型</span></span><br><span class="line">    --<span class="built_in">env</span>=MEMORY=4G \ <span class="comment"># 指定内存限制</span></span><br><span class="line">    --<span class="built_in">env</span>=LOG_TIMESTAMP=<span class="literal">true</span> \ <span class="comment"># 在日志中记录时间戳</span></span><br><span class="line">    --volume=/foo/bar:/data \ <span class="comment"># 宿主机存储目录:容器内部目录。修改为你的目录！</span></span><br><span class="line">    --restart=always \ <span class="comment"># 容器停止便立即重启</span></span><br><span class="line">    itzg/minecraft-server</span><br></pre></td></tr></table></figure>
-
 <p>执行后耐心等待镜像下载以及游戏核心下载即可，如果下载出现问题可以删除容器后重新运行。</p>
-<h2 id="MC服务器管理"><a href="#MC服务器管理" class="headerlink" title="MC服务器管理"></a>MC服务器管理</h2><ul>
+<h2 id="MC服务器管理">MC服务器管理</h2>
+<ul>
 <li>查看容器状态</li>
 </ul>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>交互式控制</li>
 </ul>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -i mcserver rcon-cli</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>只执行单条指令（例如<code>stop</code>)：</li>
 </ul>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> mcserver rcon-cli stop</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>附加到服务器命令行：</li>
 </ul>
 <figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker attach mcserver</span><br></pre></td></tr></table></figure>
-
 <p><em>退出方法：依次按下<code>Ctrl-p</code>、<code>Ctrl-q</code>以安全地退出服务器命令行。</em></p>
 <ul>
 <li>查看服务器日志：</li>

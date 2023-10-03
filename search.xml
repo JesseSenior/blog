@@ -1,68 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>WSL2多开Ubuntu实例</title>
+    <url>/posts/90d3eb82/</url>
+    <content><![CDATA[<p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
+<p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
+<span id="more"></span>
+<h2 id="下载-Ubuntu-WSL2-最新镜像">下载 Ubuntu WSL2 最新镜像</h2>
+<p>Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）可以在<a href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">cloud-images.ubuntu.com</a>下载。但考虑到国内网络环境，也可以通过清华大学开源软件镜像站（<a href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">mirrors.tuna.tsinghua.edu.cn</a>）（或者别的国内镜像站）下载。</p>
+<p>参考下载命令:</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Invoke-WebRequest</span> <span class="literal">-Uri</span> <span class="string">&quot;https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span> <span class="literal">-OutFile</span> <span class="string">&quot;ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span></span><br></pre></td></tr></table></figure>
+<h2 id="导入到WSL2中">导入到WSL2中</h2>
+<p>导入命令如下所示</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> &lt;DistroName&gt; &lt;InstallLocation&gt; &lt;InstallTarFile&gt;</span><br></pre></td></tr></table></figure>
+<p>其中<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>：</p>
+<ul>
+<li><code>&lt;DistroName&gt;</code>：实例名称</li>
+<li><code>&lt;InstallLocation&gt;</code>：实例安装位置</li>
+<li><code>&lt;InstallTarFile&gt;</code>：安装文件位置</li>
+</ul>
+<p>以下为命令示例：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> Ubuntu<span class="literal">-Example</span>  .\Ubuntu<span class="literal">-Example</span>\ .\ubuntu<span class="literal">-jammy-wsl-amd64-wsl</span>.rootfs.tar.gz</span><br></pre></td></tr></table></figure>
+<p>修改实例名和安装位置就可以实现多开辣！</p>
+<p>导入成功后可以通过以下命令进入创建好的Ubuntu实例：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">-d</span> &lt;DistroName&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="配置普通用户账户">配置普通用户账户</h2>
+<p>在容器中运行以下命令<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">read</span> -p <span class="string">&quot;Please enter username: &quot;</span> NEW_USER</span><br><span class="line">useradd -m -G sudo -s /bin/bash <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line">passwd <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line"><span class="built_in">tee</span> /etc/wsl.conf &lt;&lt;<span class="string">_EOF</span></span><br><span class="line"><span class="string">[user]</span></span><br><span class="line"><span class="string">default=$&#123;NEW_USER&#125;</span></span><br><span class="line"><span class="string">_EOF</span></span><br></pre></td></tr></table></figure>
+<p>然后退出WSL2容器(Ctrl+D)，在PowerShell中运行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wsl --terminate &lt;Distribution Name&gt;</span><br><span class="line">wsl -d &lt;Distribution Name&gt;</span><br></pre></td></tr></table></figure>
+<p>现在便是以普通用户进行操作啦~</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p><a href="https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro">https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro</a> <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p><a href="https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2">https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2</a> <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>WSL2</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>在Ubuntu中搭建你的MC服务器——基于Docker</title>
     <url>/posts/bc472a12/</url>
-    <content><![CDATA[<p><del>MC超好玩的，谁会拒绝有趣的红石捏？</del></p>
+    <content><![CDATA[<p><s>MC超好玩的，谁会拒绝有趣的红石捏？</s></p>
 <p>本文主要记录一种在Ubuntu服务器中便捷地搭建MC服务器的方法。</p>
 <span id="more"></span>
-
-<h2 id="搭建环境"><a href="#搭建环境" class="headerlink" title="搭建环境"></a>搭建环境</h2><ul>
-<li>Ubuntu 21.10 (GNU&#x2F;Linux 5.13.0-39-generic x86_64)</li>
+<h2 id="搭建环境">搭建环境</h2>
+<ul>
+<li>Ubuntu 21.10 (GNU/Linux 5.13.0-39-generic x86_64)</li>
 <li>Docker version 20.10.14, build a224086</li>
-<li>Docker Image: itzg&#x2F;minecraft-server:latest</li>
+<li>Docker Image: itzg/minecraft-server:latest</li>
 </ul>
-<h2 id="前置：Docker-安装"><a href="#前置：Docker-安装" class="headerlink" title="前置：Docker 安装"></a>前置：Docker 安装</h2><p>详细内容可参考<a href="https://docs.docker.com/engine/install/ubuntu/">Docker官方文档</a>，如果不害怕英文的话。</p>
+<h2 id="前置：Docker-安装">前置：Docker 安装</h2>
+<p>详细内容可参考<a href="https://docs.docker.com/engine/install/ubuntu/">Docker官方文档</a>，如果不害怕英文的话。</p>
 <p>注意，以下的方案均需要服务器sudo权限，</p>
-<h3 id="懒人方案——使用脚本"><a href="#懒人方案——使用脚本" class="headerlink" title="懒人方案——使用脚本"></a>懒人方案——使用脚本</h3><blockquote>
-<p>Docker provides a convenience script at get.docker.com to install Docker into development environments quickly and non-interactively. <strong>The convenience script is not recommended for production environments</strong>, but can be used as an example to create a provisioning script that is tailored to your needs.</p>
+<h3 id="懒人方案——使用脚本">懒人方案——使用脚本</h3>
+<blockquote>
+<p>Docker provides a convenience script at <a href="http://get.docker.com">get.docker.com</a> to install Docker into development environments quickly and non-interactively. <strong>The convenience script is not recommended for production environments</strong>, but can be used as an example to create a provisioning script that is tailored to your needs.</p>
 </blockquote>
 <p>在命令行中输入以下命令：</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">curl -fsSL https://get.docker.com -o get-docker.sh</span><br><span class="line">sudo sh get-docker.sh</span><br></pre></td></tr></table></figure>
-
 <p>然后等一会就好了。</p>
-<h3 id="手动方案——从官方仓库下载"><a href="#手动方案——从官方仓库下载" class="headerlink" title="手动方案——从官方仓库下载"></a>手动方案——从官方仓库下载</h3><h4 id="配置仓库"><a href="#配置仓库" class="headerlink" title="配置仓库"></a>配置仓库</h4><ol>
+<h3 id="手动方案——从官方仓库下载">手动方案——从官方仓库下载</h3>
+<h4 id="配置仓库">配置仓库</h4>
+<ol>
 <li>下载前置包并添加Docker官方GPG公钥</li>
 </ol>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install \</span><br><span class="line">    ca-certificates \</span><br><span class="line">    curl \</span><br><span class="line">    gnupg \</span><br><span class="line">    lsb-release</span><br><span class="line">curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg</span><br></pre></td></tr></table></figure>
-
 <ol start="2">
 <li>添加Docker稳定版仓库</li>
 </ol>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">echo</span> \</span><br><span class="line">  <span class="string">&quot;deb [arch=<span class="subst">$(dpkg --print-architecture)</span> signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \</span></span><br><span class="line"><span class="string">  <span class="subst">$(lsb_release -cs)</span> stable&quot;</span> | sudo <span class="built_in">tee</span> /etc/apt/sources.list.d/docker.list &gt; /dev/null</span><br></pre></td></tr></table></figure>
-
-<h4 id="下载Docker"><a href="#下载Docker" class="headerlink" title="下载Docker"></a>下载Docker</h4><figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
-
+<h4 id="下载Docker">下载Docker</h4>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install docker-ce docker-ce-cli containerd.io</span><br></pre></td></tr></table></figure>
 <p>验证安装是否成功：</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">sudo docker run hello-world</span><br></pre></td></tr></table></figure>
-
 <p>如果成功则可以看到如下截图：</p>
-<p><img src="/posts/bc472a12/pic_1649234026617.png" alt="图 1">  </p>
-<h2 id="在Docker中部署Minecraft-Server"><a href="#在Docker中部署Minecraft-Server" class="headerlink" title="在Docker中部署Minecraft Server"></a>在Docker中部署Minecraft Server</h2><p>这里使用一个由itzg以及其余百位大佬共同维护的一个Docker镜像：<a href="https://hub.docker.com/r/itzg/minecraft-server">minecraft-server</a>（<a href="https://github.com/itzg/docker-minecraft-server">Github地址</a>）</p>
+<p><img src="/posts/bc472a12/pic_1649234026617.png" alt="图 1"></p>
+<h2 id="在Docker中部署Minecraft-Server">在Docker中部署Minecraft Server</h2>
+<p>这里使用一个由itzg以及其余百位大佬共同维护的一个Docker镜像：<a href="https://hub.docker.com/r/itzg/minecraft-server">minecraft-server</a>（<a href="https://github.com/itzg/docker-minecraft-server">Github地址</a>）</p>
 <p>在命令行中输入以下指令（注意修改部分参数以符合你的需求）：</p>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker run \</span><br><span class="line">    -d -it \ <span class="comment"># 后台运行容器，以交互模式运行容器并为容器重新分配一个伪终端</span></span><br><span class="line">    -p 25565:25565 \ <span class="comment"># 宿主机端口:容器端口</span></span><br><span class="line">    --name=mcserver \ <span class="comment"># 容器名称，便于后续管理</span></span><br><span class="line">    --<span class="built_in">env</span>=EXEC_DIRECTLY=<span class="literal">true</span> \ <span class="comment"># 允许docker attach显示彩色输出</span></span><br><span class="line">    --<span class="built_in">env</span>=EULA=TRUE \ <span class="comment"># 接受EULA协议</span></span><br><span class="line">    --<span class="built_in">env</span>=VERSION=1.18.2 \ <span class="comment"># 指定游戏版本为1.18.2，默认使用最新版</span></span><br><span class="line">    --<span class="built_in">env</span>=TZ=Asia/Shanghai \ <span class="comment"># mc服务器日志时区</span></span><br><span class="line">    --<span class="built_in">env</span>=TYPE=PAPER \ <span class="comment"># 服务器核心类型</span></span><br><span class="line">    --<span class="built_in">env</span>=MEMORY=4G \ <span class="comment"># 指定内存限制</span></span><br><span class="line">    --<span class="built_in">env</span>=LOG_TIMESTAMP=<span class="literal">true</span> \ <span class="comment"># 在日志中记录时间戳</span></span><br><span class="line">    --volume=/foo/bar:/data \ <span class="comment"># 宿主机存储目录:容器内部目录。修改为你的目录！</span></span><br><span class="line">    --restart=always \ <span class="comment"># 容器停止便立即重启</span></span><br><span class="line">    itzg/minecraft-server</span><br></pre></td></tr></table></figure>
-
 <p>执行后耐心等待镜像下载以及游戏核心下载即可，如果下载出现问题可以删除容器后重新运行。</p>
-<h2 id="MC服务器管理"><a href="#MC服务器管理" class="headerlink" title="MC服务器管理"></a>MC服务器管理</h2><ul>
+<h2 id="MC服务器管理">MC服务器管理</h2>
+<ul>
 <li>查看容器状态</li>
 </ul>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>交互式控制</li>
 </ul>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -i mcserver rcon-cli</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>只执行单条指令（例如<code>stop</code>)：</li>
 </ul>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> mcserver rcon-cli stop</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>附加到服务器命令行：</li>
 </ul>
 <figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">docker attach mcserver</span><br></pre></td></tr></table></figure>
-
 <p><em>退出方法：依次按下<code>Ctrl-p</code>、<code>Ctrl-q</code>以安全地退出服务器命令行。</em></p>
 <ul>
 <li>查看服务器日志：</li>
@@ -76,52 +118,24 @@
       </tags>
   </entry>
   <entry>
-    <title>WSL2多开Ubuntu实例</title>
-    <url>/posts/90d3eb82/</url>
-    <content><![CDATA[<p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件<em>（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）</em>。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
-<p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
+    <title>iCalendar日历文件裁剪</title>
+    <url>/posts/2bef1db1/</url>
+    <content><![CDATA[<p>由于了解到之前部署的Radicale<a href="https://radicale.org/v3.html#oriented-to-calendar-and-contact-user-agents">似乎并未严格遵守RFC 5545标准</a>，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。</p>
 <span id="more"></span>
-
-<h2 id="下载-Ubuntu-WSL2-最新镜像"><a href="#下载-Ubuntu-WSL2-最新镜像" class="headerlink" title="下载 Ubuntu WSL2 最新镜像"></a>下载 Ubuntu WSL2 最新镜像</h2><p>以下是Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）下载地址：</p>
-<p><a href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
-<p>但考虑到国内网络环境，也可以通过清华大学开源软件镜像站（或者别的国内镜像站）下载：</p>
-<p><a href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz</a></p>
-<p>参考下载命令:</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Invoke-WebRequest</span> <span class="literal">-Uri</span> <span class="string">&quot;https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span> <span class="literal">-OutFile</span> <span class="string">&quot;ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span></span><br></pre></td></tr></table></figure>
-
-<h2 id="导入到WSL2中"><a href="#导入到WSL2中" class="headerlink" title="导入到WSL2中"></a>导入到WSL2中</h2><p>导入命令如下所示</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> &lt;DistroName&gt; &lt;InstallLocation&gt; &lt;InstallTarFile&gt;</span><br></pre></td></tr></table></figure>
-
-<p>其中：</p>
-<ul>
-<li><code>&lt;DistroName&gt;</code>：实例名称</li>
-<li><code>&lt;InstallLocation&gt;</code>：实例安装位置</li>
-<li><code>&lt;InstallTarFile&gt;</code>：安装文件位置</li>
-</ul>
-<p>以下为命令示例：</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> Ubuntu<span class="literal">-Example</span>  .\Ubuntu<span class="literal">-Example</span>\ .\ubuntu<span class="literal">-jammy-wsl-amd64-wsl</span>.rootfs.tar.gz</span><br></pre></td></tr></table></figure>
-
-<p>修改实例名和安装位置就可以实现多开辣！</p>
-<p>导入成功后可以通过以下命令进入创建好的Ubuntu实例：</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">-d</span> &lt;DistroName&gt;</span><br></pre></td></tr></table></figure>
-
-<h2 id="配置普通用户账户"><a href="#配置普通用户账户" class="headerlink" title="配置普通用户账户"></a>配置普通用户账户</h2><p>在容器中运行以下命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">read</span> -p <span class="string">&quot;Please enter username: &quot;</span> NEW_USER</span><br><span class="line">useradd -m -G sudo -s /bin/bash <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line">passwd <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line"><span class="built_in">tee</span> /etc/wsl.conf &lt;&lt;<span class="string">_EOF</span></span><br><span class="line"><span class="string">[user]</span></span><br><span class="line"><span class="string">default=$&#123;NEW_USER&#125;</span></span><br><span class="line"><span class="string">_EOF</span></span><br></pre></td></tr></table></figure>
-
-<p>然后退出WSL2容器(Ctrl+D)，在PowerShell中运行以下命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wsl --terminate &lt;Distribution Name&gt;</span><br><span class="line">wsl -d &lt;Distribution Name&gt;</span><br></pre></td></tr></table></figure>
-
-<p>现在便是以普通用户进行操作啦~</p>
+<div class="note danger"><p>友情提示：使用脚本前请<strong>备份</strong>你的日历文件</p>
+</div>
+<p>本脚本依赖<a href="https://github.com/collective/icalendar">icalendar</a>模块。其作用主要是读入ics文件中的全部Component（例如<code>VEVENT</code>、<code>VTODO</code>等），并提取其中<strong>最近</strong>的日期（如果你的日历中有持续或者重复时间为<strong>永远</strong>的请谨慎使用），将其与<code>watershed_datetime</code>比较。若<code>is_before_watershed_datetime = True</code>，则保存比<code>watershed_datetime</code>更早的Component，否则保存更新的Component。</p>
+<figure class="highlight python"><figcaption><span>ics_rotate.py</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> icalendar <span class="keyword">import</span> Calendar</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> date, time, datetime</span><br><span class="line"><span class="keyword">import</span> pytz</span><br><span class="line"></span><br><span class="line">uniform_tz = pytz.timezone(<span class="string">&quot;Asia/Shanghai&quot;</span>)</span><br><span class="line">watershed_datetime = datetime(<span class="number">2022</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, tzinfo=uniform_tz)</span><br><span class="line">is_before_watershed_datetime = <span class="literal">True</span>  <span class="comment"># 取事件最近日期，保存分水岭前/后的事件</span></span><br><span class="line"></span><br><span class="line">read_file_path = <span class="string">&quot;my-calendar.ics&quot;</span></span><br><span class="line">save_file_path = <span class="string">&quot;my-calendar-20220101.ics&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_datetime_from_event</span>(<span class="params">event, param</span>):</span><br><span class="line">    result = event.get(param).dt</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(result) == date:</span><br><span class="line">        result = datetime.combine(</span><br><span class="line">            result,</span><br><span class="line">            time(tzinfo=uniform_tz),</span><br><span class="line">        )</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(read_file_path, <span class="string">&quot;r&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    cal = Calendar.from_ical(f.read())</span><br><span class="line"></span><br><span class="line">new_cal = Calendar()</span><br><span class="line"></span><br><span class="line">param_list = [<span class="string">&quot;dtstart&quot;</span>, <span class="string">&quot;dtend&quot;</span>, <span class="string">&quot;due&quot;</span>, <span class="string">&quot;completed&quot;</span>, <span class="string">&quot;dtstamp&quot;</span>]</span><br><span class="line">watershed_datetime = watershed_datetime.replace(tzinfo=pytz.UTC)</span><br><span class="line"><span class="keyword">for</span> event <span class="keyword">in</span> cal.walk():</span><br><span class="line">    <span class="keyword">if</span> event.name <span class="keyword">not</span> <span class="keyword">in</span> [</span><br><span class="line">        <span class="string">&quot;VEVENT&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTODO&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VJOURNAL&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VFREEBUSY&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTIMEZONE&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VALARM&quot;</span>,</span><br><span class="line">    ]:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    dates = <span class="built_in">list</span>()</span><br><span class="line">    <span class="keyword">for</span> param <span class="keyword">in</span> param_list:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            dates.append(get_datetime_from_event(event, param))</span><br><span class="line">        <span class="keyword">except</span> AttributeError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(dates) &gt; <span class="number">0</span>:</span><br><span class="line">        event_datetime = <span class="built_in">max</span>(dates).replace(tzinfo=pytz.UTC)</span><br><span class="line">        <span class="keyword">if</span> (</span><br><span class="line">            event_datetime &gt;= watershed_datetime</span><br><span class="line">        ) ^ is_before_watershed_datetime:</span><br><span class="line">            new_cal.add_component(event)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        new_cal.add_component(event)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(save_file_path, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(new_cal.to_ical().decode(<span class="string">&quot;utf-8&quot;</span>).replace(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>).strip())</span><br></pre></td></tr></table></figure>
 <hr>
 <p>参考资料：</p>
 <ul>
-<li><a href="https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2">https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2</a></li>
-<li><a href="https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro">https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro</a></li>
+<li><a href="https://docs.python.org/3/library/datetime.html">https://docs.python.org/3/library/datetime.html</a></li>
+<li><a href="https://github.com/collective/icalendar">https://github.com/collective/icalendar</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc5545">https://datatracker.ietf.org/doc/html/rfc5545</a></li>
 </ul>
 ]]></content>
       <tags>
-        <tag>Ubuntu</tag>
-        <tag>WSL2</tag>
+        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -138,29 +152,5 @@
 <hr>
 <p><code>print(&quot;Hello World!&quot;)</code></p>
 ]]></content>
-  </entry>
-  <entry>
-    <title>iCalendar日历文件裁剪</title>
-    <url>/posts/2bef1db1/</url>
-    <content><![CDATA[<p>由于了解到之前部署的Radicale<a href="https://radicale.org/v3.html#oriented-to-calendar-and-contact-user-agents">似乎并未严格遵守RFC 5545标准</a>，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。</p>
-<span id="more"></span>
-
-<div class="note danger"><p>友情提示：使用脚本前请<strong>备份</strong>你的日历文件</p>
-</div>
-
-<p>本脚本依赖<a href="https://github.com/collective/icalendar">icalendar</a>模块。其作用主要是读入ics文件中的全部Component（例如<code>VEVENT</code>、<code>VTODO</code>等），并提取其中<strong>最近</strong>的日期（如果你的日历中有持续或者重复时间为<strong>永远</strong>的请谨慎使用），将其与<code>watershed_datetime</code>比较。若<code>is_before_watershed_datetime = True</code>，则保存比<code>watershed_datetime</code>更早的Component，否则保存更新的Component。</p>
-<figure class="highlight python"><figcaption><span>ics_rotate.py</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> icalendar <span class="keyword">import</span> Calendar</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> date, time, datetime</span><br><span class="line"><span class="keyword">import</span> pytz</span><br><span class="line"></span><br><span class="line">uniform_tz = pytz.timezone(<span class="string">&quot;Asia/Shanghai&quot;</span>)</span><br><span class="line">watershed_datetime = datetime(<span class="number">2022</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, tzinfo=uniform_tz)</span><br><span class="line">is_before_watershed_datetime = <span class="literal">True</span>  <span class="comment"># 取事件最近日期，保存分水岭前/后的事件</span></span><br><span class="line"></span><br><span class="line">read_file_path = <span class="string">&quot;my-calendar.ics&quot;</span></span><br><span class="line">save_file_path = <span class="string">&quot;my-calendar-20220101.ics&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_datetime_from_event</span>(<span class="params">event, param</span>):</span><br><span class="line">    result = event.get(param).dt</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(result) == date:</span><br><span class="line">        result = datetime.combine(</span><br><span class="line">            result,</span><br><span class="line">            time(tzinfo=uniform_tz),</span><br><span class="line">        )</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(read_file_path, <span class="string">&quot;r&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    cal = Calendar.from_ical(f.read())</span><br><span class="line"></span><br><span class="line">new_cal = Calendar()</span><br><span class="line"></span><br><span class="line">param_list = [<span class="string">&quot;dtstart&quot;</span>, <span class="string">&quot;dtend&quot;</span>, <span class="string">&quot;due&quot;</span>, <span class="string">&quot;completed&quot;</span>, <span class="string">&quot;dtstamp&quot;</span>]</span><br><span class="line">watershed_datetime = watershed_datetime.replace(tzinfo=pytz.UTC)</span><br><span class="line"><span class="keyword">for</span> event <span class="keyword">in</span> cal.walk():</span><br><span class="line">    <span class="keyword">if</span> event.name <span class="keyword">not</span> <span class="keyword">in</span> [</span><br><span class="line">        <span class="string">&quot;VEVENT&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTODO&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VJOURNAL&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VFREEBUSY&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTIMEZONE&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VALARM&quot;</span>,</span><br><span class="line">    ]:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    dates = <span class="built_in">list</span>()</span><br><span class="line">    <span class="keyword">for</span> param <span class="keyword">in</span> param_list:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            dates.append(get_datetime_from_event(event, param))</span><br><span class="line">        <span class="keyword">except</span> AttributeError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(dates) &gt; <span class="number">0</span>:</span><br><span class="line">        event_datetime = <span class="built_in">max</span>(dates).replace(tzinfo=pytz.UTC)</span><br><span class="line">        <span class="keyword">if</span> (</span><br><span class="line">            event_datetime &gt;= watershed_datetime</span><br><span class="line">        ) ^ is_before_watershed_datetime:</span><br><span class="line">            new_cal.add_component(event)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        new_cal.add_component(event)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(save_file_path, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(new_cal.to_ical().decode(<span class="string">&quot;utf-8&quot;</span>).replace(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>).strip())</span><br></pre></td></tr></table></figure>
-
-<hr>
-<p>参考资料：</p>
-<ul>
-<li><a href="https://docs.python.org/3/library/datetime.html">https://docs.python.org/3/library/datetime.html</a></li>
-<li><a href="https://github.com/collective/icalendar">https://github.com/collective/icalendar</a></li>
-<li><a href="https://datatracker.ietf.org/doc/html/rfc5545">https://datatracker.ietf.org/doc/html/rfc5545</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
-      </tags>
   </entry>
 </search>
