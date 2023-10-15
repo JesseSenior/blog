@@ -1,51 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>WSL2多开Ubuntu实例</title>
-    <url>/posts/90d3eb82/</url>
-    <content><![CDATA[<p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
-<p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
-<span id="more"></span>
-<h2 id="下载-Ubuntu-WSL2-最新镜像">下载 Ubuntu WSL2 最新镜像</h2>
-<p>Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）可以在<a href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">cloud-images.ubuntu.com</a>下载。但考虑到国内网络环境，也可以通过清华大学开源软件镜像站（<a href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">mirrors.tuna.tsinghua.edu.cn</a>）（或者别的国内镜像站）下载。</p>
-<p>参考下载命令:</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Invoke-WebRequest</span> <span class="literal">-Uri</span> <span class="string">&quot;https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span> <span class="literal">-OutFile</span> <span class="string">&quot;ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span></span><br></pre></td></tr></table></figure>
-<h2 id="导入到WSL2中">导入到WSL2中</h2>
-<p>导入命令如下所示</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> &lt;DistroName&gt; &lt;InstallLocation&gt; &lt;InstallTarFile&gt;</span><br></pre></td></tr></table></figure>
-<p>其中<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>：</p>
-<ul>
-<li><code>&lt;DistroName&gt;</code>：实例名称</li>
-<li><code>&lt;InstallLocation&gt;</code>：实例安装位置</li>
-<li><code>&lt;InstallTarFile&gt;</code>：安装文件位置</li>
-</ul>
-<p>以下为命令示例：</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> Ubuntu<span class="literal">-Example</span>  .\Ubuntu<span class="literal">-Example</span>\ .\ubuntu<span class="literal">-jammy-wsl-amd64-wsl</span>.rootfs.tar.gz</span><br></pre></td></tr></table></figure>
-<p>修改实例名和安装位置就可以实现多开辣！</p>
-<p>导入成功后可以通过以下命令进入创建好的Ubuntu实例：</p>
-<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">-d</span> &lt;DistroName&gt;</span><br></pre></td></tr></table></figure>
-<h2 id="配置普通用户账户">配置普通用户账户</h2>
-<p>在容器中运行以下命令<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">read</span> -p <span class="string">&quot;Please enter username: &quot;</span> NEW_USER</span><br><span class="line">useradd -m -G sudo -s /bin/bash <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line">passwd <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line"><span class="built_in">tee</span> /etc/wsl.conf &lt;&lt;<span class="string">_EOF</span></span><br><span class="line"><span class="string">[user]</span></span><br><span class="line"><span class="string">default=$&#123;NEW_USER&#125;</span></span><br><span class="line"><span class="string">_EOF</span></span><br></pre></td></tr></table></figure>
-<p>然后退出WSL2容器(Ctrl+D)，在PowerShell中运行以下命令：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wsl --terminate &lt;Distribution Name&gt;</span><br><span class="line">wsl -d &lt;Distribution Name&gt;</span><br></pre></td></tr></table></figure>
-<p>现在便是以普通用户进行操作啦~</p>
-<hr class="footnotes-sep">
-<section class="footnotes">
-<ol class="footnotes-list">
-<li id="fn1" class="footnote-item"><p><a href="https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro">https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro</a> <a href="#fnref1" class="footnote-backref">↩︎</a></p>
-</li>
-<li id="fn2" class="footnote-item"><p><a href="https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2">https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2</a> <a href="#fnref2" class="footnote-backref">↩︎</a></p>
-</li>
-</ol>
-</section>
-]]></content>
-      <tags>
-        <tag>Ubuntu</tag>
-        <tag>WSL2</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>在Ubuntu中搭建你的MC服务器——基于Docker</title>
     <url>/posts/bc472a12/</url>
     <content><![CDATA[<p><s>MC超好玩的，谁会拒绝有趣的红石捏？</s></p>
@@ -118,6 +73,66 @@
       </tags>
   </entry>
   <entry>
+    <title>HELLO WORLD</title>
+    <url>/posts/87e5865b/</url>
+    <content><![CDATA[<p>这是Jesse Senior的第一条博客。</p>
+<p>本人之后大概会在博客上写一些自己折腾的笔记，主要也是为了让之后的人少走弯路，也是学习了那么多他人的博客后自己所做的补偿吧。[笑]</p>
+<p><img src="/posts/87e5865b/MISAKA.png" alt="理直气壮"></p>
+<p>本人的文章全部采用<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA-4.0</a>协议，借鉴本人的文章时记得使用引用或者添加脚注，搬运记得加原文链接。（应该没人会看我的文章吧…）</p>
+<p>同时本人亦会在文章中准确申明参考来源与链接。</p>
+<p>至于为什么使用<code>HELLO WORLD</code>作为标题，大概是因为这是我的第一条博客吧，就像学习编程语言时生成的第一条输出一样，是对这片新世界的第一声招呼。</p>
+<p>希望我能一直维护这个博客到毕业吧。</p>
+<p>以上，及，</p>
+<hr>
+<p><code>print(&quot;Hello World!&quot;)</code></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>WSL2多开Ubuntu实例</title>
+    <url>/posts/90d3eb82/</url>
+    <content><![CDATA[<p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
+<p>然而目前的WSL<strong>并不</strong>支持为一个发行版（本文以Ubuntu为例）启动多个示例（也就是多开），所以目前我们只能手动配置。TAT</p>
+<span id="more"></span>
+<h2 id="下载-Ubuntu-WSL2-最新镜像">下载 Ubuntu WSL2 最新镜像</h2>
+<p>Ubuntu Server 22.04 LTS (Jammy Jellyfish) 最新版本（每日构建）可以在<a href="https://cloud-images.ubuntu.com/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">cloud-images.ubuntu.com</a>下载。但考虑到国内网络环境，也可以通过清华大学开源软件镜像站（<a href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz">mirrors.tuna.tsinghua.edu.cn</a>）（或者别的国内镜像站）下载。</p>
+<p>参考下载命令:</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Invoke-WebRequest</span> <span class="literal">-Uri</span> <span class="string">&quot;https://mirrors.tuna.tsinghua.edu.cn/ubuntu-cloud-images/wsl/jammy/current/ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span> <span class="literal">-OutFile</span> <span class="string">&quot;ubuntu-jammy-wsl-amd64-wsl.rootfs.tar.gz&quot;</span></span><br></pre></td></tr></table></figure>
+<h2 id="导入到WSL2中">导入到WSL2中</h2>
+<p>导入命令如下所示</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> &lt;DistroName&gt; &lt;InstallLocation&gt; &lt;InstallTarFile&gt;</span><br></pre></td></tr></table></figure>
+<p>其中<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>：</p>
+<ul>
+<li><code>&lt;DistroName&gt;</code>：实例名称</li>
+<li><code>&lt;InstallLocation&gt;</code>：实例安装位置</li>
+<li><code>&lt;InstallTarFile&gt;</code>：安装文件位置</li>
+</ul>
+<p>以下为命令示例：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">--import</span> Ubuntu<span class="literal">-Example</span>  .\Ubuntu<span class="literal">-Example</span>\ .\ubuntu<span class="literal">-jammy-wsl-amd64-wsl</span>.rootfs.tar.gz</span><br></pre></td></tr></table></figure>
+<p>修改实例名和安装位置就可以实现多开辣！</p>
+<p>导入成功后可以通过以下命令进入创建好的Ubuntu实例：</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">wsl <span class="literal">-d</span> &lt;DistroName&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="配置普通用户账户">配置普通用户账户</h2>
+<p>在容器中运行以下命令<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">read</span> -p <span class="string">&quot;Please enter username: &quot;</span> NEW_USER</span><br><span class="line">useradd -m -G sudo -s /bin/bash <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line">passwd <span class="string">&quot;<span class="variable">$NEW_USER</span>&quot;</span></span><br><span class="line"><span class="built_in">tee</span> /etc/wsl.conf &lt;&lt;<span class="string">_EOF</span></span><br><span class="line"><span class="string">[user]</span></span><br><span class="line"><span class="string">default=$&#123;NEW_USER&#125;</span></span><br><span class="line"><span class="string">_EOF</span></span><br></pre></td></tr></table></figure>
+<p>然后退出WSL2容器(Ctrl+D)，在PowerShell中运行以下命令：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wsl --terminate &lt;Distribution Name&gt;</span><br><span class="line">wsl -d &lt;Distribution Name&gt;</span><br></pre></td></tr></table></figure>
+<p>现在便是以普通用户进行操作啦~</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p><a href="https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro">https://learn.microsoft.com/en-us/windows/wsl/use-custom-distro</a> <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p><a href="https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2">https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2</a> <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
+]]></content>
+      <tags>
+        <tag>Ubuntu</tag>
+        <tag>WSL2</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>iCalendar日历文件裁剪</title>
     <url>/posts/2bef1db1/</url>
     <content><![CDATA[<p>由于了解到之前部署的Radicale<a href="https://radicale.org/v3.html#oriented-to-calendar-and-contact-user-agents">似乎并未严格遵守RFC 5545标准</a>，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。</p>
@@ -139,18 +154,36 @@
       </tags>
   </entry>
   <entry>
-    <title>HELLO WORLD</title>
-    <url>/posts/87e5865b/</url>
-    <content><![CDATA[<p>这是Jesse Senior的第一条博客。</p>
-<p>本人之后大概会在博客上写一些自己折腾的笔记，主要也是为了让之后的人少走弯路，也是学习了那么多他人的博客后自己所做的补偿吧。[笑]</p>
-<p><img src="/posts/87e5865b/MISAKA.png" alt="理直气壮"></p>
-<p>本人的文章全部采用<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA-4.0</a>协议，借鉴本人的文章时记得使用引用或者添加脚注，搬运记得加原文链接。（应该没人会看我的文章吧…）</p>
-<p>同时本人亦会在文章中准确申明参考来源与链接。</p>
-<p>至于为什么使用<code>HELLO WORLD</code>作为标题，大概是因为这是我的第一条博客吧，就像学习编程语言时生成的第一条输出一样，是对这片新世界的第一声招呼。</p>
-<p>希望我能一直维护这个博客到毕业吧。</p>
-<p>以上，及，</p>
-<hr>
-<p><code>print(&quot;Hello World!&quot;)</code></p>
+    <title>修复OpenWrt下ax88179芯片USB网卡重启后失效问题</title>
+    <url>/posts/57b22b2/</url>
+    <content><![CDATA[<p>有的时候，不来点天灾人祸，都不知道自己维护的系统有多脆弱。</p>
+<span id="more"></span>
+<p>起因是宿舍电费用完了，学校无情自动拉闸，然后我的路由器（树莓派Rpi4b上跑的OpenWrt）就关机了。交钱、恢复供电、树莓派重启，然后LAN口（用的ax88179芯片USB网卡，简单粗暴🤣）便没网了（报应😰）。一开始还以为是AP的问题，最后经过一通排查发现OpenWrt认不出来USB网卡了。</p>
+<p>最后在StackExchange上找到了解决方法<sup class="footnote-ref"><a href="#fn1" id="fnref1">[1]</a></sup>：</p>
+<ol>
+<li>获取USB网卡ID：</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">root@OpenWrt:~<span class="comment"># lsusb |grep AX88179</span></span><br><span class="line">Bus 002 Device 004: ID 0b95:1790 ASIX AX88179A</span><br></pre></td></tr></table></figure>
+<p>如上所示，USB网卡ID为<code>0b95:1790</code></p>
+<ol start="2">
+<li>在OpenWrt系统启动后，<strong>延时重置</strong>USB网卡：</li>
+</ol>
+<p>修改<code>/etc/rc.local</code>并在<code>exit 0</code>前添加以下内容</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sleep</span> 15</span><br><span class="line">usbreset 0b95:1790</span><br></pre></td></tr></table></figure>
+<p>主打一个简单粗暴🤣。（幸好路由器上提前部署了反向代理，给维修留了后路，不然怕是要全部推倒重来罢。）</p>
+<p>后续调查发现这个问题似乎是启动顺序导致的<sup class="footnote-ref"><a href="#fn2" id="fnref2">[2]</a></sup>，但毕竟问题已经“修复”了，也就不再继续深究。如果各位找到了根本解决办法，可以在评论区补充。</p>
+<hr class="footnotes-sep">
+<section class="footnotes">
+<ol class="footnotes-list">
+<li id="fn1" class="footnote-item"><p><a href="https://unix.stackexchange.com/a/640443">StackExchange: USB-Ethernet adapter stops working periodically, as if going to sleep</a> <a href="#fnref1" class="footnote-backref">↩︎</a></p>
+</li>
+<li id="fn2" class="footnote-item"><p><a href="https://github.com/FreddyXin/ax88179_178a/issues/6#issuecomment-1208448522">Github Issue: Failed to write reg index</a> <a href="#fnref2" class="footnote-backref">↩︎</a></p>
+</li>
+</ol>
+</section>
 ]]></content>
+      <tags>
+        <tag>OpenWrt</tag>
+      </tags>
   </entry>
 </search>
