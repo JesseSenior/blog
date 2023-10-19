@@ -73,6 +73,27 @@
       </tags>
   </entry>
   <entry>
+    <title>iCalendar日历文件裁剪</title>
+    <url>/posts/2bef1db1/</url>
+    <content><![CDATA[<p>由于了解到之前部署的Radicale<a href="https://radicale.org/v3.html#oriented-to-calendar-and-contact-user-agents">似乎并未严格遵守RFC 5545标准</a>，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。</p>
+<span id="more"></span>
+<div class="note danger"><p>友情提示：使用脚本前请<strong>备份</strong>你的日历文件</p>
+</div>
+<p>本脚本依赖<a href="https://github.com/collective/icalendar">icalendar</a>模块。其作用主要是读入ics文件中的全部Component（例如<code>VEVENT</code>、<code>VTODO</code>等），并提取其中<strong>最近</strong>的日期（如果你的日历中有持续或者重复时间为<strong>永远</strong>的请谨慎使用），将其与<code>watershed_datetime</code>比较。若<code>is_before_watershed_datetime = True</code>，则保存比<code>watershed_datetime</code>更早的Component，否则保存更新的Component。</p>
+<figure class="highlight python"><figcaption><span>ics_rotate.py</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> icalendar <span class="keyword">import</span> Calendar</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> date, time, datetime</span><br><span class="line"><span class="keyword">import</span> pytz</span><br><span class="line"></span><br><span class="line">uniform_tz = pytz.timezone(<span class="string">&quot;Asia/Shanghai&quot;</span>)</span><br><span class="line">watershed_datetime = datetime(<span class="number">2022</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, tzinfo=uniform_tz)</span><br><span class="line">is_before_watershed_datetime = <span class="literal">True</span>  <span class="comment"># 取事件最近日期，保存分水岭前/后的事件</span></span><br><span class="line"></span><br><span class="line">read_file_path = <span class="string">&quot;my-calendar.ics&quot;</span></span><br><span class="line">save_file_path = <span class="string">&quot;my-calendar-20220101.ics&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_datetime_from_event</span>(<span class="params">event, param</span>):</span><br><span class="line">    result = event.get(param).dt</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(result) == date:</span><br><span class="line">        result = datetime.combine(</span><br><span class="line">            result,</span><br><span class="line">            time(tzinfo=uniform_tz),</span><br><span class="line">        )</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(read_file_path, <span class="string">&quot;r&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    cal = Calendar.from_ical(f.read())</span><br><span class="line"></span><br><span class="line">new_cal = Calendar()</span><br><span class="line"></span><br><span class="line">param_list = [<span class="string">&quot;dtstart&quot;</span>, <span class="string">&quot;dtend&quot;</span>, <span class="string">&quot;due&quot;</span>, <span class="string">&quot;completed&quot;</span>, <span class="string">&quot;dtstamp&quot;</span>]</span><br><span class="line">watershed_datetime = watershed_datetime.replace(tzinfo=pytz.UTC)</span><br><span class="line"><span class="keyword">for</span> event <span class="keyword">in</span> cal.walk():</span><br><span class="line">    <span class="keyword">if</span> event.name <span class="keyword">not</span> <span class="keyword">in</span> [</span><br><span class="line">        <span class="string">&quot;VEVENT&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTODO&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VJOURNAL&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VFREEBUSY&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTIMEZONE&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VALARM&quot;</span>,</span><br><span class="line">    ]:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    dates = <span class="built_in">list</span>()</span><br><span class="line">    <span class="keyword">for</span> param <span class="keyword">in</span> param_list:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            dates.append(get_datetime_from_event(event, param))</span><br><span class="line">        <span class="keyword">except</span> AttributeError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(dates) &gt; <span class="number">0</span>:</span><br><span class="line">        event_datetime = <span class="built_in">max</span>(dates).replace(tzinfo=pytz.UTC)</span><br><span class="line">        <span class="keyword">if</span> (</span><br><span class="line">            event_datetime &gt;= watershed_datetime</span><br><span class="line">        ) ^ is_before_watershed_datetime:</span><br><span class="line">            new_cal.add_component(event)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        new_cal.add_component(event)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(save_file_path, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(new_cal.to_ical().decode(<span class="string">&quot;utf-8&quot;</span>).replace(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>).strip())</span><br></pre></td></tr></table></figure>
+<hr>
+<p>参考资料：</p>
+<ul>
+<li><a href="https://docs.python.org/3/library/datetime.html">https://docs.python.org/3/library/datetime.html</a></li>
+<li><a href="https://github.com/collective/icalendar">https://github.com/collective/icalendar</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc5545">https://datatracker.ietf.org/doc/html/rfc5545</a></li>
+</ul>
+]]></content>
+      <tags>
+        <tag>Python</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>WSL2多开Ubuntu实例</title>
     <url>/posts/90d3eb82/</url>
     <content><![CDATA[<p>最近在捣鼓软路由和OpenWrt，经常需要开一个Linux环境来交叉编译各种固件（有一说一，挺折腾人的 ::&gt;_&lt;:: 不过也挺锻炼人的）。虽然说可以创建个linux虚拟机或者docker容器来编译，但个人觉得这些方案太“重”了，正好巨硬整了个<strong>WSL2</strong>(Windows Subsystem for Linux)这么个好东西，那当然是要充分利用起来啦(。・∀・)ノ</p>
@@ -102,6 +123,10 @@
 <p>然后退出WSL2容器(Ctrl+D)，在PowerShell中运行以下命令：</p>
 <figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">wsl --terminate &lt;Distribution Name&gt;</span><br><span class="line">wsl -d &lt;Distribution Name&gt;</span><br></pre></td></tr></table></figure>
 <p>现在便是以普通用户进行操作啦~</p>
+<h2 id="禁用appendWindowsPath">禁用appendWindowsPath</h2>
+<p>禁用<code>appendWindowsPath</code>可以避免部分玄学编译问题（例如编译OpenWrt固件时，如果路径中含有Windows路径，可能会报<code>The relative path 'Files' is included in the PATH environment variable, which is insecure in combination with the -execdir action of find.  Please remove that entry from $PATH</code>）<sup class="footnote-ref"><a href="#fn3" id="fnref3">[3]</a></sup></p>
+<p>在文件<code>/etc/wsl.conf</code>中添加以下内容，重新进入容器即可。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[interop]</span><br><span class="line">appendWindowsPath = <span class="literal">false</span></span><br></pre></td></tr></table></figure>
 <hr class="footnotes-sep">
 <section class="footnotes">
 <ol class="footnotes-list">
@@ -109,48 +134,14 @@
 </li>
 <li id="fn2" class="footnote-item"><p><a href="https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2">https://cloudbytes.dev/snippets/how-to-install-multiple-instances-of-ubuntu-in-wsl2</a> <a href="#fnref2" class="footnote-backref">↩︎</a></p>
 </li>
+<li id="fn3" class="footnote-item"><p><a href="https://github.com/coolsnowwolf/lede/issues/6597#issuecomment-825314820">https://github.com/coolsnowwolf/lede/issues/6597#issuecomment-825314820</a> <a href="#fnref3" class="footnote-backref">↩︎</a></p>
+</li>
 </ol>
 </section>
 ]]></content>
       <tags>
         <tag>Ubuntu</tag>
         <tag>WSL2</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HELLO WORLD</title>
-    <url>/posts/87e5865b/</url>
-    <content><![CDATA[<p>这是Jesse Senior的第一条博客。</p>
-<p>本人之后大概会在博客上写一些自己折腾的笔记，主要也是为了让之后的人少走弯路，也是学习了那么多他人的博客后自己所做的补偿吧。[笑]</p>
-<p><img src="/posts/87e5865b/MISAKA.png" alt="理直气壮"></p>
-<p>本人的文章全部采用<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA-4.0</a>协议，借鉴本人的文章时记得使用引用或者添加脚注，搬运记得加原文链接。（应该没人会看我的文章吧…）</p>
-<p>同时本人亦会在文章中准确申明参考来源与链接。</p>
-<p>至于为什么使用<code>HELLO WORLD</code>作为标题，大概是因为这是我的第一条博客吧，就像学习编程语言时生成的第一条输出一样，是对这片新世界的第一声招呼。</p>
-<p>希望我能一直维护这个博客到毕业吧。</p>
-<p>以上，及，</p>
-<hr>
-<p><code>print(&quot;Hello World!&quot;)</code></p>
-]]></content>
-  </entry>
-  <entry>
-    <title>iCalendar日历文件裁剪</title>
-    <url>/posts/2bef1db1/</url>
-    <content><![CDATA[<p>由于了解到之前部署的Radicale<a href="https://radicale.org/v3.html#oriented-to-calendar-and-contact-user-agents">似乎并未严格遵守RFC 5545标准</a>，而Radicale在苹果设备上访问比较麻烦，所以前段时间尝试将自己的日历服务重新部署到Baikal（但事后发现部署变得更麻烦了TAT），在备份日历文件的时候发现自己的日历文件体积太大了，便顺手抽时间写了个python脚本来切割日历文件。</p>
-<span id="more"></span>
-<div class="note danger"><p>友情提示：使用脚本前请<strong>备份</strong>你的日历文件</p>
-</div>
-<p>本脚本依赖<a href="https://github.com/collective/icalendar">icalendar</a>模块。其作用主要是读入ics文件中的全部Component（例如<code>VEVENT</code>、<code>VTODO</code>等），并提取其中<strong>最近</strong>的日期（如果你的日历中有持续或者重复时间为<strong>永远</strong>的请谨慎使用），将其与<code>watershed_datetime</code>比较。若<code>is_before_watershed_datetime = True</code>，则保存比<code>watershed_datetime</code>更早的Component，否则保存更新的Component。</p>
-<figure class="highlight python"><figcaption><span>ics_rotate.py</span></figcaption><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> icalendar <span class="keyword">import</span> Calendar</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> date, time, datetime</span><br><span class="line"><span class="keyword">import</span> pytz</span><br><span class="line"></span><br><span class="line">uniform_tz = pytz.timezone(<span class="string">&quot;Asia/Shanghai&quot;</span>)</span><br><span class="line">watershed_datetime = datetime(<span class="number">2022</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, tzinfo=uniform_tz)</span><br><span class="line">is_before_watershed_datetime = <span class="literal">True</span>  <span class="comment"># 取事件最近日期，保存分水岭前/后的事件</span></span><br><span class="line"></span><br><span class="line">read_file_path = <span class="string">&quot;my-calendar.ics&quot;</span></span><br><span class="line">save_file_path = <span class="string">&quot;my-calendar-20220101.ics&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">get_datetime_from_event</span>(<span class="params">event, param</span>):</span><br><span class="line">    result = event.get(param).dt</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">type</span>(result) == date:</span><br><span class="line">        result = datetime.combine(</span><br><span class="line">            result,</span><br><span class="line">            time(tzinfo=uniform_tz),</span><br><span class="line">        )</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(read_file_path, <span class="string">&quot;r&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    cal = Calendar.from_ical(f.read())</span><br><span class="line"></span><br><span class="line">new_cal = Calendar()</span><br><span class="line"></span><br><span class="line">param_list = [<span class="string">&quot;dtstart&quot;</span>, <span class="string">&quot;dtend&quot;</span>, <span class="string">&quot;due&quot;</span>, <span class="string">&quot;completed&quot;</span>, <span class="string">&quot;dtstamp&quot;</span>]</span><br><span class="line">watershed_datetime = watershed_datetime.replace(tzinfo=pytz.UTC)</span><br><span class="line"><span class="keyword">for</span> event <span class="keyword">in</span> cal.walk():</span><br><span class="line">    <span class="keyword">if</span> event.name <span class="keyword">not</span> <span class="keyword">in</span> [</span><br><span class="line">        <span class="string">&quot;VEVENT&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTODO&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VJOURNAL&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VFREEBUSY&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VTIMEZONE&quot;</span>,</span><br><span class="line">        <span class="string">&quot;VALARM&quot;</span>,</span><br><span class="line">    ]:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    dates = <span class="built_in">list</span>()</span><br><span class="line">    <span class="keyword">for</span> param <span class="keyword">in</span> param_list:</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            dates.append(get_datetime_from_event(event, param))</span><br><span class="line">        <span class="keyword">except</span> AttributeError:</span><br><span class="line">            <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(dates) &gt; <span class="number">0</span>:</span><br><span class="line">        event_datetime = <span class="built_in">max</span>(dates).replace(tzinfo=pytz.UTC)</span><br><span class="line">        <span class="keyword">if</span> (</span><br><span class="line">            event_datetime &gt;= watershed_datetime</span><br><span class="line">        ) ^ is_before_watershed_datetime:</span><br><span class="line">            new_cal.add_component(event)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        new_cal.add_component(event)</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(save_file_path, <span class="string">&quot;w&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(new_cal.to_ical().decode(<span class="string">&quot;utf-8&quot;</span>).replace(<span class="string">&quot;\r\n&quot;</span>, <span class="string">&quot;\n&quot;</span>).strip())</span><br></pre></td></tr></table></figure>
-<hr>
-<p>参考资料：</p>
-<ul>
-<li><a href="https://docs.python.org/3/library/datetime.html">https://docs.python.org/3/library/datetime.html</a></li>
-<li><a href="https://github.com/collective/icalendar">https://github.com/collective/icalendar</a></li>
-<li><a href="https://datatracker.ietf.org/doc/html/rfc5545">https://datatracker.ietf.org/doc/html/rfc5545</a></li>
-</ul>
-]]></content>
-      <tags>
-        <tag>Python</tag>
       </tags>
   </entry>
   <entry>
@@ -185,5 +176,20 @@
       <tags>
         <tag>OpenWrt</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>HELLO WORLD</title>
+    <url>/posts/87e5865b/</url>
+    <content><![CDATA[<p>这是Jesse Senior的第一条博客。</p>
+<p>本人之后大概会在博客上写一些自己折腾的笔记，主要也是为了让之后的人少走弯路，也是学习了那么多他人的博客后自己所做的补偿吧。[笑]</p>
+<p><img src="/posts/87e5865b/MISAKA.png" alt="理直气壮"></p>
+<p>本人的文章全部采用<a href="https://creativecommons.org/licenses/by-sa/4.0/">CC-BY-SA-4.0</a>协议，借鉴本人的文章时记得使用引用或者添加脚注，搬运记得加原文链接。（应该没人会看我的文章吧…）</p>
+<p>同时本人亦会在文章中准确申明参考来源与链接。</p>
+<p>至于为什么使用<code>HELLO WORLD</code>作为标题，大概是因为这是我的第一条博客吧，就像学习编程语言时生成的第一条输出一样，是对这片新世界的第一声招呼。</p>
+<p>希望我能一直维护这个博客到毕业吧。</p>
+<p>以上，及，</p>
+<hr>
+<p><code>print(&quot;Hello World!&quot;)</code></p>
+]]></content>
   </entry>
 </search>
